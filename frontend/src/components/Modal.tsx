@@ -5,9 +5,11 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   labelledBy: string;
+  /** Widens the panel for multi-column forms. */
+  wide?: boolean;
 }
 
-export function Modal({ onClose, children, labelledBy }: ModalProps) {
+export function Modal({ onClose, children, labelledBy, wide = false }: ModalProps) {
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -32,7 +34,12 @@ export function Modal({ onClose, children, labelledBy }: ModalProps) {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div className="modal-panel" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
+      <div
+        className={`modal-panel${wide ? ' modal-panel--wide' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={labelledBy}
+      >
         <button type="button" className="modal-close" onClick={onClose} aria-label={t('common.close')}>
           ×
         </button>

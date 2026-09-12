@@ -256,6 +256,71 @@ form button[type='submit'] {
   margin-top: var(--space-6);
 }
 
+/* Two short fields side by side; collapses on narrow viewports. */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+/* Yes/no choice rendered as a segmented control. The selected segment uses a
+   neutral surface step, not the accent — lime stays on the submit button. */
+.field-choice {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field-choice legend {
+  padding: 0;
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.choice-options {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.choice-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-direction: row;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-control);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition), background-color var(--transition);
+}
+
+.choice-options label:hover {
+  color: var(--text-primary);
+}
+
+.choice-options label.is-selected {
+  background: var(--surface-3);
+  border-color: var(--text-secondary);
+  color: var(--text-primary);
+}
+
+.choice-options input[type='radio'] {
+  margin: 0;
+  width: auto;
+  padding: 0;
+  accent-color: var(--text-primary);
+}
+
+.field-hint {
+  font-size: var(--text-label);
+  color: var(--text-faint);
+}
+
 .form-error {
   color: var(--danger);
   font-size: var(--text-caption);
@@ -339,6 +404,12 @@ form button[type='submit'] {
   max-width: 420px;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+/* Registration carries owner + company details, so it gets the wider panel. */
+.modal-panel--wide {
+  max-width: 620px;
+  padding: var(--space-10);
 }
 
 .modal-close {

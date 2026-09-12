@@ -20,6 +20,7 @@ export function AppLayout() {
         <span className="brand">{t('app.name')}</span>
         <nav>
           <NavLink to="/dashboard">{t('nav.dashboard')}</NavLink>
+          <NavLink to="/settings/company">{t('nav.settings')}</NavLink>
         </nav>
         <LanguageSwitcher />
         <ThemeToggle />

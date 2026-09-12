@@ -4,10 +4,13 @@
   },
   "common": {
     "loading": "Loading...",
-    "close": "Close"
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No"
   },
   "nav": {
     "dashboard": "Dashboard",
+    "settings": "Settings",
     "login": "Log in",
     "register": "Register",
     "getStarted": "Get started",
@@ -64,15 +67,42 @@
       "email": "Email",
       "password": "Password",
       "companyName": "Company name",
-      "companyTaxId": "Tax ID (EDB)",
+      "legalForm": "Legal form",
+      "legalFormPlaceholder": "Select a legal form",
+      "embs": "Registration number (EMBS)",
+      "edb": "Tax number (EDB)",
+      "registeredAddress": "Registered address",
+      "isVatPayer": "VAT-registered",
+      "isVatPayerHint": "Determines whether VAT is calculated on invoices.",
+      "digitsOnly": "Digits only.",
       "submit": "Register",
       "hasAccount": "Already have an account?",
       "loginLink": "Log in"
     }
   },
+  "legalForm": {
+    "DOOEL": "DOOEL",
+    "DOO": "DOO",
+    "AD": "AD (joint-stock)",
+    "TP": "TP (sole trader)",
+    "OTHER": "Other"
+  },
   "dashboard": {
     "title": "Company overview",
     "placeholder": "Financial and workforce data will appear here soon."
+  },
+  "settings": {
+    "company": {
+      "title": "Company settings",
+      "intro": "Details that aren't required at signup will be filled in here.",
+      "pendingHeading": "In progress",
+      "pendingBadge": "coming soon",
+      "iban": "Bank account (IBAN)",
+      "ibanNote": "Required on invoices.",
+      "phone": "Company phone number",
+      "logo": "Company logo",
+      "website": "Website"
+    }
   },
   "notFound": {
     "title": "Page not found",

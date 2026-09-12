@@ -114,8 +114,13 @@
     gap: var(--space-4);
   }
 
-  .modal-panel {
+  .modal-panel,
+  .modal-panel--wide {
     padding: var(--space-6) var(--space-5);
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
   }
 
   .app-content {

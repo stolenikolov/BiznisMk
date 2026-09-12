@@ -5,6 +5,7 @@ import { PublicOnlyRoute } from '../auth/PublicOnlyRoute.tsx';
 import { RequireAuth } from '../auth/RequireAuth.tsx';
 import { LandingPage } from '../pages/LandingPage.tsx';
 import { DashboardPage } from '../pages/DashboardPage.tsx';
+import { CompanySettingsPage } from '../pages/CompanySettingsPage.tsx';
 import { NotFoundPage } from '../pages/NotFoundPage.tsx';
 
 export const router = createBrowserRouter([
@@ -28,7 +29,10 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <AppLayout />,
-        children: [{ path: '/dashboard', element: <DashboardPage /> }],
+        children: [
+          { path: '/dashboard', element: <DashboardPage /> },
+          { path: '/settings/company', element: <CompanySettingsPage /> },
+        ],
       },
     ],
   },

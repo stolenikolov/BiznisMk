@@ -54,6 +54,32 @@
   color: var(--text-muted);
 }
 
+.settings-pending {
+  margin-top: var(--space-6);
+  max-width: 520px;
+}
+
+.settings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.settings-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.settings-list li:last-child {
+  border-bottom: none;
+}
+
 .not-found {
   display: flex;
   flex-direction: column;
