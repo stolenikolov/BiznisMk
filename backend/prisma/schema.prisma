@@ -1,0 +1,176 @@
+// Prisma schema for BiznisMk
+// This initial pass establishes the multi-tenant identity model (User / Company /
+// CompanyMembership) plus stub domain models that will be fleshed out in a follow-up.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Global identity. A User is not tied to any single company — access to a
+/// company's data is granted exclusively through a CompanyMembership.
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships   CompanyMembership[]
+  refreshTokens RefreshToken[]
+  employeeLinks Employee[]          @relation("EmployeeUserAccount")
+
+  @@map("users")
+}
+
+/// A hashed refresh token issued to a User. Refresh tokens are rotated on
+/// every use: the token presented is looked up by hash, checked for
+/// revocation/expiry, then revoked and replaced with a new row.
+model RefreshToken {
+  id          String    @id @default(uuid())
+  tokenHash   String    @unique
+  userId      String
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  replacedBy  String?
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+/// A tenant. All company-scoped data (employees, invoices, schedules, ...)
+/// hangs off this model. Locale/currency/VAT fields are kept per-company
+/// (rather than hardcoded) so the app can extend beyond North Macedonia later.
+model Company {
+  id               String   @id @default(uuid())
+  name             String
+  taxId            String   @unique @map("tax_id") // EDB (Единствен даночен број)
+  registrationNo   String?  @map("registration_no") // EMBS
+  address          String?
+  city             String?
+  country          String   @default("MK")
+  currency         String   @default("MKD")
+  defaultVatRate   Decimal  @default(18.0) @map("default_vat_rate") @db.Decimal(5, 2)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  memberships CompanyMembership[]
+  employees   Employee[]
+  invoices    Invoice[]
+  schedules   Schedule[]
+
+  @@map("companies")
+}
+
+enum CompanyRole {
+  OWNER
+  MANAGER
+  EMPLOYEE
+}
+
+/// Join model linking a User to a Company with a role scoped to that company.
+/// This is what the login/company-switcher flow reads to decide which
+/// companies a user can enter and what they're allowed to do inside each.
+model CompanyMembership {
+  id        String      @id @default(uuid())
+  userId    String
+  companyId String
+  role      CompanyRole
+  createdAt DateTime    @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+  @@index([companyId])
+  @@map("company_memberships")
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+/// Stub — will grow to cover contracts, salary history, documents, etc.
+/// `userId` is nullable and only set once an employee is given self-service
+/// login access; most employees will not have a User account at all.
+model Employee {
+  id         String         @id @default(uuid())
+  companyId  String
+  userId     String?
+  firstName  String
+  lastName   String
+  position   String?
+  baseSalary Decimal?       @map("base_salary") @db.Decimal(12, 2)
+  status     EmployeeStatus @default(ACTIVE)
+  hiredAt    DateTime?      @map("hired_at")
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userAccount User?    @relation("EmployeeUserAccount", fields: [userId], references: [id], onDelete: SetNull)
+  schedules Schedule[]
+
+  @@index([companyId])
+  @@map("employees")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+/// Stub — will grow to cover line items, VAT breakdown, PDF snapshots, etc.
+model Invoice {
+  id            String        @id @default(uuid())
+  companyId     String
+  invoiceNumber String        @map("invoice_number")
+  clientName    String        @map("client_name")
+  totalAmount   Decimal       @map("total_amount") @db.Decimal(12, 2)
+  currency      String        @default("MKD")
+  status        InvoiceStatus @default(DRAFT)
+  issueDate     DateTime      @map("issue_date")
+  dueDate       DateTime?     @map("due_date")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, invoiceNumber])
+  @@index([companyId])
+  @@map("invoices")
+}
+
+/// Stub — a single scheduled shift for an employee. Will grow to cover
+/// recurrence, shift templates, and leave-request integration.
+model Schedule {
+  id         String   @id @default(uuid())
+  companyId  String
+  employeeId String
+  date       DateTime @db.Date
+  startTime  DateTime @map("start_time")
+  endTime    DateTime @map("end_time")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@map("schedules")
+}
