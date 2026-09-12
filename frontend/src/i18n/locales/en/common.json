@@ -1,0 +1,41 @@
+{
+  "app": {
+    "name": "BiznisMk"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "login": "Log in",
+    "register": "Register"
+  },
+  "language": {
+    "mk": "Macedonian",
+    "en": "English"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register"
+    },
+    "register": {
+      "title": "Register",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Register",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Log in"
+    }
+  },
+  "dashboard": {
+    "title": "Company overview",
+    "placeholder": "Financial and workforce data will appear here soon."
+  },
+  "notFound": {
+    "title": "Page not found"
+  }
+}
