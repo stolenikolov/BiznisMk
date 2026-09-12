@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { api } from '../lib/api.ts';
-import { useAuth } from '../auth/useAuth.ts';
+import { useAuth } from './useAuth.ts';
+import { Modal } from '../components/Modal.tsx';
 
-export function LoginPage() {
+export function LoginModal() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { refetch } = useAuth();
@@ -13,6 +14,8 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const close = () => navigate('/');
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -31,25 +34,31 @@ export function LoginPage() {
   };
 
   return (
-    <section className="auth-page">
-      <h1>{t('auth.login.title')}</h1>
+    <Modal onClose={close} labelledBy="login-modal-title">
+      <h2 id="login-modal-title" className="modal-title">
+        {t('auth.login.title')}
+      </h2>
       <form onSubmit={handleSubmit}>
         <label>
           {t('auth.login.email')}
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
         </label>
         <label>
           {t('auth.login.password')}
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </label>
-        {error && <p role="alert">{error}</p>}
-        <button type="submit" disabled={isSubmitting}>
+        {error && (
+          <p role="alert" className="form-error">
+            {error}
+          </p>
+        )}
+        <button type="submit" className="btn-primary" disabled={isSubmitting}>
           {t('auth.login.submit')}
         </button>
       </form>
-      <p>
-        {t('auth.login.noAccount')} <Link to="/register">{t('auth.login.registerLink')}</Link>
+      <p className="modal-footer">
+        {t('auth.login.noAccount')} <Link to="/register" replace>{t('auth.login.registerLink')}</Link>
       </p>
-    </section>
+    </Modal>
   );
 }

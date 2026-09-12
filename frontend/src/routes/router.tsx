@@ -5,8 +5,6 @@ import { PublicOnlyRoute } from '../auth/PublicOnlyRoute.tsx';
 import { RequireAuth } from '../auth/RequireAuth.tsx';
 import { LandingPage } from '../pages/LandingPage.tsx';
 import { DashboardPage } from '../pages/DashboardPage.tsx';
-import { LoginPage } from '../pages/LoginPage.tsx';
-import { RegisterPage } from '../pages/RegisterPage.tsx';
 import { NotFoundPage } from '../pages/NotFoundPage.tsx';
 
 export const router = createBrowserRouter([
@@ -16,9 +14,11 @@ export const router = createBrowserRouter([
       {
         element: <PublicOnlyRoute />,
         children: [
+          // /login and /register render the same landing page underneath —
+          // PublicLayout reads the path and overlays the matching modal on top.
           { path: '/', element: <LandingPage /> },
-          { path: '/login', element: <LoginPage /> },
-          { path: '/register', element: <RegisterPage /> },
+          { path: '/login', element: <LandingPage /> },
+          { path: '/register', element: <LandingPage /> },
         ],
       },
     ],

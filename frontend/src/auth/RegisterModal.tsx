@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { api } from '../lib/api.ts';
-import { useAuth } from '../auth/useAuth.ts';
+import { useAuth } from './useAuth.ts';
+import { Modal } from '../components/Modal.tsx';
 
 function extractErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
@@ -15,7 +16,7 @@ function extractErrorMessage(err: unknown): string {
   return 'Unknown error';
 }
 
-export function RegisterPage() {
+export function RegisterModal() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { refetch } = useAuth();
@@ -28,6 +29,8 @@ export function RegisterPage() {
   const [companyTaxId, setCompanyTaxId] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const close = () => navigate('/');
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -47,14 +50,16 @@ export function RegisterPage() {
   };
 
   return (
-    <section className="auth-page">
-      <h1>{t('auth.register.title')}</h1>
+    <Modal onClose={close} labelledBy="register-modal-title">
+      <h2 id="register-modal-title" className="modal-title">
+        {t('auth.register.title')}
+      </h2>
       <form onSubmit={handleSubmit}>
-        <fieldset>
-          <legend>{t('auth.register.ownerHeading')}</legend>
+        <div className="form-section">
+          <h3 className="form-section-title">{t('auth.register.ownerHeading')}</h3>
           <label>
             {t('auth.register.firstName')}
-            <input value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+            <input value={firstName} onChange={(e) => setFirstName(e.target.value)} required autoFocus />
           </label>
           <label>
             {t('auth.register.lastName')}
@@ -74,10 +79,10 @@ export function RegisterPage() {
               required
             />
           </label>
-        </fieldset>
+        </div>
 
-        <fieldset>
-          <legend>{t('auth.register.companyHeading')}</legend>
+        <div className="form-section">
+          <h3 className="form-section-title">{t('auth.register.companyHeading')}</h3>
           <label>
             {t('auth.register.companyName')}
             <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
@@ -86,16 +91,20 @@ export function RegisterPage() {
             {t('auth.register.companyTaxId')}
             <input value={companyTaxId} onChange={(e) => setCompanyTaxId(e.target.value)} required />
           </label>
-        </fieldset>
+        </div>
 
-        {error && <p role="alert">{error}</p>}
-        <button type="submit" disabled={isSubmitting}>
+        {error && (
+          <p role="alert" className="form-error">
+            {error}
+          </p>
+        )}
+        <button type="submit" className="btn-primary" disabled={isSubmitting}>
           {t('auth.register.submit')}
         </button>
       </form>
-      <p>
-        {t('auth.register.hasAccount')} <Link to="/login">{t('auth.register.loginLink')}</Link>
+      <p className="modal-footer">
+        {t('auth.register.hasAccount')} <Link to="/login" replace>{t('auth.register.loginLink')}</Link>
       </p>
-    </section>
+    </Modal>
   );
 }

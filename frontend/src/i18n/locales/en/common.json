@@ -3,7 +3,8 @@
     "name": "BiznisMk"
   },
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "close": "Close"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -16,21 +17,23 @@
     "en": "English"
   },
   "landing": {
-    "tagline": "Manage your business, effortlessly.",
-    "subtitle": "Finances, employees, and invoices — all in one place.",
+    "eyebrow": "FOR BUSINESSES IN NORTH MACEDONIA",
+    "headline": "Run your business. No chaos, no spreadsheets.",
+    "subtext": "Finances, employees, schedules, and invoices — all in one place, in real time.",
     "registerCta": "Register your business",
+    "loginHint": "Already have an account? Log in →",
     "features": {
       "finance": {
-        "title": "Finance overview",
-        "description": "Track income and expenses in real time."
+        "title": "Real-time finances",
+        "description": "Track income and expenses without a maze of spreadsheets."
       },
-      "employees": {
-        "title": "Employee management",
-        "description": "Schedules, salaries, and leave — organized in one place."
+      "team": {
+        "title": "Team & schedules",
+        "description": "Shifts, leave, and payroll — organized in one place."
       },
-      "notifications": {
-        "title": "Real-time notifications",
-        "description": "Stay informed the moment something happens."
+      "invoices": {
+        "title": "Automatic invoices",
+        "description": "Generate invoices that match local regulations."
       }
     }
   },
