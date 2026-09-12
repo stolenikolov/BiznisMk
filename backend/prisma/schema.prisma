@@ -48,21 +48,41 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
+/// The legal form a company is registered under. Determines the suffix shown
+/// after the company name on invoices (e.g. "Најди Книга ДООЕЛ").
+enum CompanyLegalForm {
+  DOOEL
+  DOO
+  AD
+  TP
+  OTHER
+}
+
 /// A tenant. All company-scoped data (employees, invoices, schedules, ...)
 /// hangs off this model. Locale/currency/VAT fields are kept per-company
 /// (rather than hardcoded) so the app can extend beyond North Macedonia later.
 model Company {
-  id               String   @id @default(uuid())
-  name             String
-  taxId            String   @unique @map("tax_id") // EDB (Единствен даночен број)
-  registrationNo   String?  @map("registration_no") // EMBS
-  address          String?
-  city             String?
-  country          String   @default("MK")
-  currency         String   @default("MKD")
-  defaultVatRate   Decimal  @default(18.0) @map("default_vat_rate") @db.Decimal(5, 2)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id   String @id @default(uuid())
+  name String
+
+  /// ЕМБС — the registration number issued by the Централен регистар. This is
+  /// a different identifier from `edb`; the two are never interchangeable.
+  embs String @unique
+  /// ЕДБ — the tax number issued by the УЈП.
+  edb  String @unique
+
+  legalForm         CompanyLegalForm @map("legal_form")
+  /// Registered seat address. Required because it must appear on every invoice.
+  registeredAddress String           @map("registered_address")
+  /// Whether the company is VAT-registered. No default: registration forces an
+  /// explicit choice, because it decides whether invoices carry VAT at all.
+  isVatPayer        Boolean          @map("is_vat_payer")
+
+  country        String   @default("MK")
+  currency       String   @default("MKD")
+  defaultVatRate Decimal  @default(18.0) @map("default_vat_rate") @db.Decimal(5, 2)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   memberships CompanyMembership[]
   employees   Employee[]
