@@ -27,10 +27,8 @@ export function LandingPage() {
 
       <section className="landing-features">
         {FEATURES.map(({ key, Icon }) => (
-          <div key={key} className="feature-card">
-            <div className="feature-icon">
-              <Icon />
-            </div>
+          <div key={key} className="feature-item">
+            <Icon />
             <h2>{t(`landing.features.${key}.title`)}</h2>
             <p>{t(`landing.features.${key}.description`)}</p>
           </div>

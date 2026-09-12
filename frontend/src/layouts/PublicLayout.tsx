@@ -10,7 +10,6 @@ export function PublicLayout() {
 
   return (
     <div className="public-shell">
-      <div className="public-glow" aria-hidden="true" />
       <header className="public-header">
         <Link to="/" className="brand">
           {t('app.name')}
