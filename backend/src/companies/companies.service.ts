@@ -7,7 +7,7 @@ import type { CreateCompanyDto } from './dto/create-company.dto.js';
 export class CompaniesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** Creates a company and grants the creating user the OWNER role on it. */
+  /** Creates a company and grants the creating user the CEO role on it. */
   async create(ownerId: string, dto: CreateCompanyDto) {
     const existing = await this.prisma.company.findFirst({
       where: { OR: [{ embs: dto.embs }, { edb: dto.edb }] },
@@ -34,7 +34,7 @@ export class CompaniesService {
         memberships: {
           create: {
             userId: ownerId,
-            role: CompanyRole.OWNER,
+            role: CompanyRole.CEO,
           },
         },
       },

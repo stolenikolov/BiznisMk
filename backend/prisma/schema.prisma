@@ -84,16 +84,38 @@ model Company {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  memberships CompanyMembership[]
-  employees   Employee[]
-  invoices    Invoice[]
-  schedules   Schedule[]
+  memberships  CompanyMembership[]
+  employees    Employee[]
+  invoices     Invoice[]
+  schedules    Schedule[]
+  bankAccounts BankAccount[]
 
   @@map("companies")
 }
 
+/// A company transaction account. Balance is stored here for now; once the
+/// transactions module exists it will be derived from posted entries instead.
+model BankAccount {
+  id        String   @id @default(uuid())
+  companyId String
+  bankName  String   @map("bank_name")
+  iban      String
+  currency  String   @default("MKD")
+  balance   Decimal  @default(0) @db.Decimal(14, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, iban])
+  @@index([companyId])
+  @@map("bank_accounts")
+}
+
+/// Role a user holds inside one company. CEO is the top role and is what a
+/// company's creator gets; Manager and Employee are layered in later.
 enum CompanyRole {
-  OWNER
+  CEO
   MANAGER
   EMPLOYEE
 }
