@@ -2,14 +2,37 @@
   "app": {
     "name": "BiznisMk"
   },
+  "common": {
+    "loading": "Loading..."
+  },
   "nav": {
     "dashboard": "Dashboard",
     "login": "Log in",
-    "register": "Register"
+    "register": "Register",
+    "logout": "Log out"
   },
   "language": {
     "mk": "Macedonian",
     "en": "English"
+  },
+  "landing": {
+    "tagline": "Manage your business, effortlessly.",
+    "subtitle": "Finances, employees, and invoices — all in one place.",
+    "registerCta": "Register your business",
+    "features": {
+      "finance": {
+        "title": "Finance overview",
+        "description": "Track income and expenses in real time."
+      },
+      "employees": {
+        "title": "Employee management",
+        "description": "Schedules, salaries, and leave — organized in one place."
+      },
+      "notifications": {
+        "title": "Real-time notifications",
+        "description": "Stay informed the moment something happens."
+      }
+    }
   },
   "auth": {
     "login": {
@@ -21,11 +44,15 @@
       "registerLink": "Register"
     },
     "register": {
-      "title": "Register",
+      "title": "Register your business",
+      "ownerHeading": "Owner details",
+      "companyHeading": "Company details",
       "firstName": "First name",
       "lastName": "Last name",
       "email": "Email",
       "password": "Password",
+      "companyName": "Company name",
+      "companyTaxId": "Tax ID (EDB)",
       "submit": "Register",
       "hasAccount": "Already have an account?",
       "loginLink": "Log in"

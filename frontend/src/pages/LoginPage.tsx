@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { api } from '../lib/api.ts';
+import { useAuth } from '../auth/useAuth.ts';
 
 export function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { refetch } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +20,8 @@ export function LoginPage() {
     setIsSubmitting(true);
     try {
       await api.post('/auth/login', { email, password });
-      navigate('/');
+      await refetch();
+      navigate('/dashboard');
     } catch (err) {
       const message = axios.isAxiosError(err) ? (err.response?.data?.message ?? err.message) : 'Unknown error';
       setError(Array.isArray(message) ? message.join(', ') : message);
@@ -28,7 +31,7 @@ export function LoginPage() {
   };
 
   return (
-    <section>
+    <section className="auth-page">
       <h1>{t('auth.login.title')}</h1>
       <form onSubmit={handleSubmit}>
         <label>

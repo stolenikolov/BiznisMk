@@ -88,6 +88,116 @@ body {
   margin: 0 auto;
 }
 
+.logout-button {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* Public (logged-out) shell: landing, login, register */
+
+.public-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 32px;
+}
+
+.public-header .app-name {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.public-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.public-header-actions a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.public-content {
+  flex: 1;
+  padding: 24px;
+}
+
+.auth-page {
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: var(--text);
+}
+
+/* Landing page */
+
+.landing {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.landing-hero {
+  text-align: center;
+  padding: 80px 16px 64px;
+}
+
+.landing-hero h1 {
+  font-size: 40px;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+
+.landing-subtitle {
+  font-size: 18px;
+  color: var(--text);
+  opacity: 0.75;
+  margin: 0 auto 32px;
+  max-width: 520px;
+}
+
+.landing-cta {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 17px;
+  padding: 14px 32px;
+  border-radius: 6px;
+}
+
+.landing-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 32px;
+  padding: 0 16px 80px;
+}
+
+.landing-feature h2 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+.landing-feature p {
+  margin: 0;
+  opacity: 0.75;
+  font-size: 15px;
+}
+
 form {
   display: flex;
   flex-direction: column;
@@ -122,6 +232,22 @@ form button {
 form button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+form fieldset {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+form legend {
+  padding: 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.75;
 }
 
 [role='alert'] {

@@ -1,5 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom';
+import { PublicLayout } from '../layouts/PublicLayout.tsx';
 import { AppLayout } from '../layouts/AppLayout.tsx';
+import { PublicOnlyRoute } from '../auth/PublicOnlyRoute.tsx';
+import { RequireAuth } from '../auth/RequireAuth.tsx';
+import { LandingPage } from '../pages/LandingPage.tsx';
 import { DashboardPage } from '../pages/DashboardPage.tsx';
 import { LoginPage } from '../pages/LoginPage.tsx';
 import { RegisterPage } from '../pages/RegisterPage.tsx';
@@ -7,13 +11,26 @@ import { NotFoundPage } from '../pages/NotFoundPage.tsx';
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <AppLayout />,
+    element: <PublicLayout />,
     children: [
-      { index: true, element: <DashboardPage /> },
-      { path: 'login', element: <LoginPage /> },
-      { path: 'register', element: <RegisterPage /> },
-      { path: '*', element: <NotFoundPage /> },
+      {
+        element: <PublicOnlyRoute />,
+        children: [
+          { path: '/', element: <LandingPage /> },
+          { path: '/login', element: <LoginPage /> },
+          { path: '/register', element: <RegisterPage /> },
+        ],
+      },
     ],
   },
+  {
+    element: <RequireAuth />,
+    children: [
+      {
+        element: <AppLayout />,
+        children: [{ path: '/dashboard', element: <DashboardPage /> }],
+      },
+    ],
+  },
+  { path: '*', element: <NotFoundPage /> },
 ]);
