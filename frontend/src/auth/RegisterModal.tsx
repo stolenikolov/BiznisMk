@@ -69,6 +69,7 @@ export function RegisterModal() {
       <h2 id="register-modal-title" className="modal-title">
         {t('auth.register.title')}
       </h2>
+      <p className="modal-note">{t('auth.register.allRequired')}</p>
       <form onSubmit={handleSubmit}>
         <div className="form-section">
           <h3 className="form-section-title label-caps">{t('auth.register.ownerHeading')}</h3>

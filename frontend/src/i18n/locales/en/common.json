@@ -60,6 +60,7 @@
     },
     "register": {
       "title": "Register your business",
+      "allRequired": "All fields are required.",
       "ownerHeading": "Owner details",
       "companyHeading": "Company details",
       "firstName": "First name",
