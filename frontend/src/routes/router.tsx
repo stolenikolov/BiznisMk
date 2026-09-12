@@ -1,11 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { PublicLayout } from '../layouts/PublicLayout.tsx';
-import { AppLayout } from '../layouts/AppLayout.tsx';
+import { DashboardLayout } from '../layouts/DashboardLayout.tsx';
 import { PublicOnlyRoute } from '../auth/PublicOnlyRoute.tsx';
 import { RequireAuth } from '../auth/RequireAuth.tsx';
 import { LandingPage } from '../pages/LandingPage.tsx';
 import { DashboardPage } from '../pages/DashboardPage.tsx';
+import { BankAccountsPage } from '../pages/BankAccountsPage.tsx';
 import { CompanySettingsPage } from '../pages/CompanySettingsPage.tsx';
+import { SectionStubPage } from '../pages/SectionStubPage.tsx';
 import { NotFoundPage } from '../pages/NotFoundPage.tsx';
 
 export const router = createBrowserRouter([
@@ -28,9 +30,14 @@ export const router = createBrowserRouter([
     element: <RequireAuth />,
     children: [
       {
-        element: <AppLayout />,
+        element: <DashboardLayout />,
         children: [
           { path: '/dashboard', element: <DashboardPage /> },
+          { path: '/finance', element: <SectionStubPage section="finance" /> },
+          { path: '/finance/accounts', element: <BankAccountsPage /> },
+          { path: '/employees', element: <SectionStubPage section="employees" /> },
+          { path: '/invoices', element: <SectionStubPage section="invoices" /> },
+          { path: '/schedule', element: <SectionStubPage section="schedule" /> },
           { path: '/settings/company', element: <CompanySettingsPage /> },
         ],
       },

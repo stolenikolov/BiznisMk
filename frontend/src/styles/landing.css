@@ -122,8 +122,4 @@
   .form-row {
     grid-template-columns: 1fr;
   }
-
-  .app-content {
-    padding: var(--space-8) var(--space-4);
-  }
 }

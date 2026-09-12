@@ -6,15 +6,41 @@
     "loading": "Loading...",
     "close": "Close",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "sectionPending": "This section is in progress."
   },
   "nav": {
-    "dashboard": "Dashboard",
+    "sections": "Sections",
+    "company": "Company",
+    "dashboard": "Overview",
+    "finance": "Finance",
+    "employees": "Employees",
+    "invoices": "Invoices",
+    "schedule": "Schedule",
     "settings": "Settings",
     "login": "Log in",
     "register": "Register",
     "getStarted": "Get started",
     "logout": "Log out"
+  },
+  "role": {
+    "CEO": "CEO",
+    "MANAGER": "Manager",
+    "EMPLOYEE": "Employee"
+  },
+  "accounts": {
+    "title": "Transaction accounts",
+    "addCta": "Add transaction account",
+    "addTitle": "New transaction account",
+    "viewIndividually": "View accounts individually",
+    "bankName": "Bank",
+    "iban": "Account / IBAN",
+    "currency": "Currency",
+    "balance": "Balance",
+    "openingBalance": "Opening balance",
+    "balanceHint": "For example: 1250.50",
+    "save": "Save account",
+    "empty": "No accounts registered yet."
   },
   "language": {
     "mk": "Macedonian",
@@ -90,6 +116,9 @@
   },
   "dashboard": {
     "title": "Company overview",
+    "totalBalance": "Total balance",
+    "accountCount_one": "{{count}} account",
+    "accountCount_other": "{{count}} accounts",
     "placeholder": "Financial and workforce data will appear here soon."
   },
   "settings": {

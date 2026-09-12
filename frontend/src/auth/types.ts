@@ -1,4 +1,4 @@
-export type CompanyRole = 'OWNER' | 'MANAGER' | 'EMPLOYEE';
+export type CompanyRole = 'CEO' | 'MANAGER' | 'EMPLOYEE';
 
 export interface AuthUser {
   userId: string;

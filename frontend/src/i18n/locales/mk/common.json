@@ -6,15 +6,41 @@
     "loading": "Се вчитува...",
     "close": "Затвори",
     "yes": "Да",
-    "no": "Не"
+    "no": "Не",
+    "sectionPending": "Овој дел е во изработка."
   },
   "nav": {
+    "sections": "Делови",
+    "company": "Компанија",
     "dashboard": "Преглед",
+    "finance": "Финансии",
+    "employees": "Вработени",
+    "invoices": "Фактури",
+    "schedule": "Распоред",
     "settings": "Поставки",
     "login": "Најава",
     "register": "Регистрација",
     "getStarted": "Започни",
     "logout": "Одјава"
+  },
+  "role": {
+    "CEO": "Директор",
+    "MANAGER": "Менаџер",
+    "EMPLOYEE": "Вработен"
+  },
+  "accounts": {
+    "title": "Трансакциски сметки",
+    "addCta": "Додади трансакциска сметка",
+    "addTitle": "Нова трансакциска сметка",
+    "viewIndividually": "Прегледај ги сметките поединечно",
+    "bankName": "Банка",
+    "iban": "Сметка / IBAN",
+    "currency": "Валута",
+    "balance": "Состојба",
+    "openingBalance": "Почетна состојба",
+    "balanceHint": "Пример: 1250.50",
+    "save": "Зачувај сметка",
+    "empty": "Сè уште нема регистрирани сметки."
   },
   "language": {
     "mk": "Македонски",
@@ -90,6 +116,9 @@
   },
   "dashboard": {
     "title": "Преглед на компанијата",
+    "totalBalance": "Вкупна состојба",
+    "accountCount_one": "{{count}} сметка",
+    "accountCount_other": "{{count}} сметки",
     "placeholder": "Тука наскоро ќе се појават финансиски и кадровски податоци."
   },
   "settings": {
