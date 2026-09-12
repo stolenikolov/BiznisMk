@@ -14,10 +14,10 @@ export function LandingPage() {
   return (
     <div className="landing">
       <section className="landing-hero">
-        <span className="eyebrow">{t('landing.eyebrow')}</span>
-        <h1>{t('landing.headline')}</h1>
+        <span className="eyebrow label-caps">{t('landing.eyebrow')}</span>
+        <h1 className="type-hero">{t('landing.headline')}</h1>
         <p className="landing-subtitle">{t('landing.subtext')}</p>
-        <Link to="/register" className="btn-primary btn-large">
+        <Link to="/register" className="btn-primary btn-lg">
           {t('landing.registerCta')}
         </Link>
         <p className="landing-login-hint">

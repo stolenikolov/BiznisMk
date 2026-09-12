@@ -5,8 +5,8 @@ export function DashboardPage() {
 
   return (
     <section>
-      <h1>{t('dashboard.title')}</h1>
-      <p>{t('dashboard.placeholder')}</p>
+      <h1 className="page-title">{t('dashboard.title')}</h1>
+      <p className="dashboard-placeholder">{t('dashboard.placeholder')}</p>
     </section>
   );
 }

@@ -16,6 +16,10 @@
     "mk": "Macedonian",
     "en": "English"
   },
+  "theme": {
+    "dark": "Switch to dark theme",
+    "light": "Switch to light theme"
+  },
   "landing": {
     "eyebrow": "FOR BUSINESSES IN NORTH MACEDONIA",
     "headline": "Run your business. No chaos, no spreadsheets.",
@@ -66,6 +70,7 @@
     "placeholder": "Financial and workforce data will appear here soon."
   },
   "notFound": {
-    "title": "Page not found"
+    "title": "Page not found",
+    "backHome": "Back to home"
   }
 }

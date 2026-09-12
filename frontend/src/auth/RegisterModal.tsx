@@ -56,7 +56,7 @@ export function RegisterModal() {
       </h2>
       <form onSubmit={handleSubmit}>
         <div className="form-section">
-          <h3 className="form-section-title">{t('auth.register.ownerHeading')}</h3>
+          <h3 className="form-section-title label-caps">{t('auth.register.ownerHeading')}</h3>
           <label>
             {t('auth.register.firstName')}
             <input value={firstName} onChange={(e) => setFirstName(e.target.value)} required autoFocus />
@@ -82,7 +82,7 @@ export function RegisterModal() {
         </div>
 
         <div className="form-section">
-          <h3 className="form-section-title">{t('auth.register.companyHeading')}</h3>
+          <h3 className="form-section-title label-caps">{t('auth.register.companyHeading')}</h3>
           <label>
             {t('auth.register.companyName')}
             <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />

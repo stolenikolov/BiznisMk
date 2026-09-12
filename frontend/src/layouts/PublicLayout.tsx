@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/LanguageSwitcher.tsx';
+import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { LoginModal } from '../auth/LoginModal.tsx';
 import { RegisterModal } from '../auth/RegisterModal.tsx';
 
@@ -19,6 +20,7 @@ export function PublicLayout() {
             {t('nav.login')}
           </Link>
           <LanguageSwitcher />
+          <ThemeToggle />
         </div>
       </header>
       <main className="public-content">
