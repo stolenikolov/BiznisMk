@@ -1,93 +1,124 @@
+/* Landing page — left-aligned oversized hero, then a large product frame,
+   then alternating text/frame bands at 96px section gaps. No card grids. */
+
 .landing {
-  max-width: 860px;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+  padding-bottom: var(--space-32);
 }
 
 .landing-hero {
-  text-align: center;
-  padding: var(--space-9) var(--space-4) var(--space-8);
+  padding-top: var(--space-24);
+  max-width: 840px;
 }
 
-.eyebrow {
+.landing-eyebrow {
   display: block;
   margin-bottom: var(--space-5);
 }
 
 .landing-hero h1 {
-  max-width: 700px;
-  margin-inline: auto;
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
 }
 
 .landing-subtitle {
-  font-size: var(--text-section);
-  color: var(--text-secondary);
-  max-width: 480px;
-  margin: 0 auto var(--space-7);
+  font-size: var(--text-body-lg);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--track-subheading);
+  line-height: 1.4;
+  color: var(--text-muted);
+  max-width: 560px;
+  margin-bottom: var(--space-8);
 }
 
-.landing-login-hint {
-  margin-top: var(--space-5);
+.landing-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
 }
 
-.landing-login-hint a {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: color var(--transition);
-}
+/* Alternating band: copy on one side, product frame on the other. */
 
-.landing-login-hint a:hover {
-  color: var(--accent);
-}
-
-.landing-features {
+.landing-band {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-7);
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 0 var(--space-4) var(--space-9);
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: var(--space-16);
+  align-items: center;
 }
 
-.feature-item svg {
-  width: 20px;
-  height: 20px;
-  color: var(--accent);
+/* Mirror the column widths too, so the product frame keeps the same width in
+   both band directions. */
+.landing-band--reverse {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+}
+
+.landing-band--reverse .landing-band-copy {
+  order: 2;
+}
+
+.landing-band-icon {
+  color: var(--text-muted);
   margin-bottom: var(--space-4);
 }
 
-.feature-item h2 {
-  font-size: var(--text-base);
-  font-weight: 600;
-  margin-bottom: var(--space-2);
+.landing-band-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
-.feature-item p {
-  font-size: var(--text-sm);
-  line-height: 1.6;
-  color: var(--text-secondary);
+.landing-band-copy h2 {
+  font-size: var(--text-subheading);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--track-subheading);
+  line-height: 1.13;
+  margin-bottom: var(--space-3);
+}
+
+.landing-band-copy p {
+  font-size: var(--text-body);
+  color: var(--text-muted);
+  max-width: 420px;
+}
+
+@media (max-width: 860px) {
+  .landing-hero {
+    padding-top: var(--space-16);
+  }
+
+  .landing-band {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  .landing-band--reverse .landing-band-copy {
+    order: 0;
+  }
 }
 
 @media (max-width: 640px) {
   .public-header {
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-3) var(--space-4);
   }
 
-  .landing-hero {
-    padding: var(--space-8) var(--space-2) var(--space-7);
+  .public-content {
+    padding: 0 var(--space-4);
   }
 
-  .landing-features {
-    grid-template-columns: 1fr;
-    gap: var(--space-6);
+  .landing {
+    gap: var(--space-16);
+  }
+
+  .landing-actions {
+    gap: var(--space-4);
   }
 
   .modal-panel {
-    padding: var(--space-5) var(--space-4);
+    padding: var(--space-6) var(--space-5);
   }
 
   .app-content {
-    padding: var(--space-6) var(--space-5);
+    padding: var(--space-8) var(--space-4);
   }
 }

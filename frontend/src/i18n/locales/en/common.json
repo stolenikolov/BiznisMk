@@ -10,6 +10,7 @@
     "dashboard": "Dashboard",
     "login": "Log in",
     "register": "Register",
+    "getStarted": "Get started",
     "logout": "Log out"
   },
   "language": {
@@ -26,6 +27,10 @@
     "subtext": "Finances, employees, schedules, and invoices — all in one place, in real time.",
     "registerCta": "Register your business",
     "loginHint": "Already have an account? Log in →",
+    "preview": {
+      "dashboard": "App preview goes here",
+      "pending": "Screenshot slot — in progress"
+    },
     "features": {
       "finance": {
         "title": "Real-time finances",

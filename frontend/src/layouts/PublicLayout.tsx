@@ -16,11 +16,14 @@ export function PublicLayout() {
           {t('app.name')}
         </Link>
         <div className="public-header-actions">
+          <LanguageSwitcher />
+          <ThemeToggle />
           <Link to="/login" className="nav-link">
             {t('nav.login')}
           </Link>
-          <LanguageSwitcher />
-          <ThemeToggle />
+          <Link to="/register" className="btn-contrast">
+            {t('nav.getStarted')}
+          </Link>
         </div>
       </header>
       <main className="public-content">

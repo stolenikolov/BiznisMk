@@ -1,17 +1,19 @@
-/* Buttons — one shape (rounded, --radius-control) everywhere. At most one
-   filled cyan primary per screen or section; everything else is ghost/quiet. */
+/* Buttons — 6px radius. The acid-lime fill is the ONE chromatic action per
+   view; the white/ink pill is the nav CTA; everything else is neutral. */
 
 .btn-primary,
+.btn-contrast,
 .btn-ghost,
 .btn-quiet {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  padding: var(--space-3) var(--space-5);
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-body-sm);
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-control);
   cursor: pointer;
   transition: background-color var(--transition), border-color var(--transition), color var(--transition);
@@ -28,25 +30,33 @@
   border-color: var(--accent-hover);
 }
 
-.btn-primary:active {
-  background: var(--accent-press);
-  border-color: var(--accent-press);
+/* Neutral high-contrast pill — the nav sign-up CTA. */
+.btn-contrast {
+  background: var(--contrast-fill);
+  color: var(--contrast-ink);
+  border: 1px solid var(--contrast-fill);
+  border-radius: var(--radius-pill);
+  padding: var(--space-2) var(--space-4);
+}
+
+.btn-contrast:hover {
+  opacity: 0.88;
 }
 
 .btn-ghost {
   background: transparent;
-  color: var(--text-primary);
-  border: 1px solid var(--hairline-strong);
+  color: var(--text-secondary);
+  border: 1px solid var(--hairline);
 }
 
 .btn-ghost:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--hairline-strong);
+  color: var(--text-primary);
 }
 
 .btn-quiet {
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   border: 1px solid transparent;
   padding: var(--space-2) var(--space-3);
 }
@@ -56,6 +66,7 @@
 }
 
 .btn-primary:disabled,
+.btn-contrast:disabled,
 .btn-ghost:disabled,
 .btn-quiet:disabled {
   opacity: 0.5;
@@ -63,22 +74,32 @@
 }
 
 .btn-lg {
-  font-size: var(--text-base);
-  padding: var(--space-4) var(--space-6);
+  font-size: var(--text-body-sm);
+  padding: var(--space-3) var(--space-5);
 }
 
-/* Cards — flat surface, hairline border, no shadow. */
+/* Text link with trailing arrow — the secondary CTA pattern. */
+.link-arrow {
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+.link-arrow:hover {
+  color: var(--text-primary);
+}
+
+/* Cards — 12px radius, hairline inset border, no outer shadow. */
 
 .card {
   background: var(--surface-1);
-  border: 1px solid var(--hairline);
   border-radius: var(--radius-card);
-  padding: var(--space-5);
+  box-shadow: var(--hairline) 0 0 0 1px inset;
+  padding: var(--card-padding);
 }
 
 .card-interactive:hover {
   background: var(--surface-2);
-  border-color: var(--hairline-strong);
 }
 
 .card-header {
@@ -89,8 +110,47 @@
   margin-bottom: var(--space-4);
 }
 
-/* KPI figure — the display serif moment inside a card. Add .kpi-value--accent
-   to the single number on the screen that matters most. */
+/* Product-UI frame — the showcase surface for app screenshots. Until a real
+   screen exists, .frame-placeholder fills it with a labelled empty state. */
+
+.ui-frame {
+  background: var(--surface-1);
+  border-radius: var(--radius-card);
+  box-shadow: var(--hairline) 0 0 0 1px inset;
+  padding: var(--space-3);
+}
+
+.frame-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  aspect-ratio: 16 / 10;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  text-align: center;
+  padding: var(--space-6);
+}
+
+/* Full-bleed hero frame: fixed height instead of a ratio, so it spans the
+   page width rather than shrinking itself to keep 16:10. */
+.frame-placeholder--hero {
+  aspect-ratio: auto;
+  height: 400px;
+}
+
+.frame-placeholder-icon {
+  color: var(--text-faint);
+}
+
+.frame-placeholder-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* KPI figure. Add .kpi-value--accent to the single number that matters most. */
 
 .kpi-label {
   display: block;
@@ -99,43 +159,53 @@
 
 .kpi-value {
   display: block;
-  font-size: var(--text-kpi);
 }
 
 .kpi-value--accent {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .kpi-delta {
   display: inline-block;
   margin-top: var(--space-2);
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 .kpi-delta.is-negative {
   color: var(--negative);
 }
 
-/* Badges / tags — the only pill-shaped element in the system. */
+/* Badges — 4px radius, near-invisible fill. Chromatic variants label, never act. */
 
 .badge {
   display: inline-block;
-  font-size: var(--text-xs);
-  font-weight: 600;
-  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-label);
+  font-weight: var(--weight-regular);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-badge);
+  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+  color: var(--text-muted);
+}
+
+.badge-pill {
   border-radius: var(--radius-pill);
-  background: var(--surface-2);
-  border: 1px solid var(--hairline);
+  padding: var(--space-1) var(--space-3);
   color: var(--text-secondary);
 }
 
-.badge-accent {
-  background: var(--accent-soft);
-  border-color: transparent;
-  color: var(--accent);
+.badge-green {
+  color: var(--tag-green);
 }
 
-/* Forms — label above input, always. */
+.badge-red {
+  color: var(--tag-red);
+}
+
+.badge-violet {
+  color: var(--tag-violet);
+}
+
+/* Forms — label above input, 6px radius, border brightens on focus. */
 
 form {
   display: flex;
@@ -147,20 +217,20 @@ form label {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-regular);
+  color: var(--text-muted);
 }
 
 form input,
 form select,
 form textarea {
-  font-family: var(--font-body);
-  font-size: var(--text-base);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
   padding: var(--space-3);
-  border: 1px solid var(--hairline-strong);
   border-radius: var(--radius-control);
-  background: var(--surface-2);
+  background: color-mix(in srgb, var(--text-primary) 2%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);
   color: var(--text-primary);
 }
 
@@ -168,7 +238,7 @@ form input:focus,
 form select:focus,
 form textarea:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--text-secondary);
 }
 
 form button[type='submit'] {
@@ -183,41 +253,37 @@ form button[type='submit'] {
 }
 
 .form-section + .form-section {
-  margin-top: var(--space-5);
-}
-
-.form-section-title {
-  margin-bottom: 0;
+  margin-top: var(--space-6);
 }
 
 .form-error {
   color: var(--danger);
-  font-size: var(--text-sm);
+  font-size: var(--text-caption);
 }
 
-/* Tables — hairline separators, no zebra striping, mono numeric columns. */
+/* Tables — hairline separators, mono numeric columns, compact padding. */
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--text-sm);
+  font-size: var(--text-body-sm);
 }
 
 .table th {
   text-align: left;
-  padding: 0 var(--space-4) var(--space-3);
+  padding: 0 var(--space-3) var(--space-3);
   border-bottom: 1px solid var(--hairline);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: var(--track-caps);
+  font-size: var(--text-label);
+  font-weight: var(--weight-regular);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-tertiary);
+  color: var(--text-muted);
 }
 
 .table td {
-  padding: var(--space-4);
+  padding: var(--space-3);
   border-bottom: 1px solid var(--hairline);
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .table tbody tr:hover td {
@@ -240,51 +306,49 @@ form button[type='submit'] {
 }
 
 .table th.num {
-  color: var(--text-tertiary);
+  color: var(--text-muted);
 }
-
-/* Divider */
 
 .divider {
   height: 1px;
   background: var(--hairline);
   border: none;
-  margin: var(--space-6) 0;
+  margin: var(--space-12) 0;
 }
 
-/* Modal — a card lifted onto a dimmed canvas; surface step, no shadow. */
+/* Modal */
 
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: color-mix(in srgb, var(--canvas) 78%, transparent);
+  background: color-mix(in srgb, var(--canvas) 80%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-5);
+  padding: var(--space-6);
   z-index: 100;
 }
 
 .modal-panel {
   position: relative;
   background: var(--surface-1);
-  border: 1px solid var(--hairline);
   border-radius: var(--radius-card);
-  padding: var(--space-6);
+  box-shadow: var(--hairline) 0 0 0 1px inset;
+  padding: var(--space-8);
   width: 100%;
-  max-width: 440px;
+  max-width: 420px;
   max-height: 90vh;
   overflow-y: auto;
 }
 
 .modal-close {
   position: absolute;
-  top: var(--space-4);
-  right: var(--space-4);
+  top: var(--space-3);
+  right: var(--space-3);
   background: none;
   border: none;
-  color: var(--text-tertiary);
-  font-size: 22px;
+  color: var(--text-faint);
+  font-size: 20px;
   line-height: 1;
   padding: var(--space-1) var(--space-2);
   cursor: pointer;
@@ -296,22 +360,26 @@ form button[type='submit'] {
 }
 
 .modal-title {
-  font-family: var(--font-display);
-  font-weight: 300;
-  letter-spacing: var(--track-display);
-  font-size: 1.5rem;
-  margin-bottom: var(--space-5);
-  padding-right: var(--space-5);
+  font-size: var(--text-title);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-subheading);
+  color: var(--text-primary);
+  margin-bottom: var(--space-6);
+  padding-right: var(--space-6);
 }
 
 .modal-footer {
-  margin-top: var(--space-5);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
+  margin-top: var(--space-6);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
   text-align: center;
 }
 
+/* Neutral, not lime: the submit button is already this view's one primary
+   action, and the accent is reserved for exactly that. */
 .modal-footer a {
-  color: var(--accent);
-  font-weight: 600;
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
