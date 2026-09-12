@@ -241,6 +241,26 @@ form textarea:focus {
   border-color: var(--text-secondary);
 }
 
+/* The native dropdown list is painted by the browser from the select's own
+   colours. A translucent background left the popup light while the options
+   inherited white text, so they rendered invisible — these need opaque values
+   and explicitly styled options. */
+form select {
+  background: var(--surface-2);
+}
+
+/* Not scoped to forms: every select in the app needs this, including the
+   company switcher in the header, which sits in a label rather than a form. */
+select option {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+/* --text-faint only reaches ~3:1 against the popup; muted clears AA. */
+select option:disabled {
+  color: var(--text-muted);
+}
+
 form button[type='submit'] {
   margin-top: var(--space-1);
   width: 100%;
