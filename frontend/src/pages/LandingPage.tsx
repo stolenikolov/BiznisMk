@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FinanceIcon, ImageIcon, InvoiceIcon, TeamIcon } from '../components/icons.tsx';
+import { useReveal } from '../lib/useReveal.ts';
 
 const BANDS = [
   { key: 'finance', Icon: FinanceIcon },
@@ -10,8 +11,10 @@ const BANDS = [
 
 /** Stand-in for a product screenshot until the real screen exists. */
 function PreviewFrame({ caption, hero = false }: { caption: string; hero?: boolean }) {
+  const { ref, revealed } = useReveal<HTMLDivElement>();
+
   return (
-    <div className="ui-frame">
+    <div ref={ref} className={`ui-frame reveal${revealed ? ' is-revealed' : ''}`}>
       <div className={`frame-placeholder${hero ? ' frame-placeholder--hero' : ''}`}>
         <span className="frame-placeholder-icon">
           <ImageIcon />
