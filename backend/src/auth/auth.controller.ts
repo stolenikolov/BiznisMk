@@ -58,9 +58,13 @@ export class AuthController {
     return { success: true };
   }
 
+  /**
+   * Reads the profile from the database rather than echoing the token, so a
+   * renamed user or company shows up without waiting for the token to expire.
+   */
   @Get('me')
-  me(@CurrentUser() user: AuthenticatedUser) {
-    return { user };
+  async me(@CurrentUser() user: AuthenticatedUser) {
+    return { user: await this.authService.describeCurrentUser(user) };
   }
 
   @Get('companies')

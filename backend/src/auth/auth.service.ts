@@ -6,6 +6,7 @@ import { TokensService } from './tokens.service.js';
 import type { RegisterDto } from './dto/register.dto.js';
 import type { LoginDto } from './dto/login.dto.js';
 import type { AccessTokenPayload } from './types/jwt-payload.type.js';
+import type { CompanyRole } from '../generated/prisma/enums.js';
 
 function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
@@ -115,6 +116,31 @@ export class AuthService {
       where: { tokenHash, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+  }
+
+  /** Token claims plus the display names the dashboard greeting needs. */
+  async describeCurrentUser(user: {
+    userId: string;
+    email: string;
+    companyId?: string;
+    role?: CompanyRole;
+  }) {
+    const [profile, company] = await Promise.all([
+      this.prisma.user.findUnique({
+        where: { id: user.userId },
+        select: { firstName: true, lastName: true },
+      }),
+      user.companyId
+        ? this.prisma.company.findUnique({ where: { id: user.companyId }, select: { name: true } })
+        : null,
+    ]);
+
+    return {
+      ...user,
+      firstName: profile?.firstName ?? null,
+      lastName: profile?.lastName ?? null,
+      companyName: company?.name ?? null,
+    };
   }
 
   async findMemberships(userId: string) {
