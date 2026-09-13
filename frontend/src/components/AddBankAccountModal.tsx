@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { api } from '../lib/api.ts';
 import { Modal } from './Modal.tsx';
+import { MACEDONIAN_BANKS, OTHER_BANK } from '../lib/macedonianBanks.ts';
 
 const CURRENCIES = ['MKD', 'EUR', 'USD'] as const;
 
@@ -23,12 +24,16 @@ interface Props {
 
 export function AddBankAccountModal({ onClose, onCreated }: Props) {
   const { t } = useTranslation();
-  const [bankName, setBankName] = useState('');
+  const [selectedBank, setSelectedBank] = useState('');
+  const [customBank, setCustomBank] = useState('');
   const [iban, setIban] = useState('');
   const [currency, setCurrency] = useState<string>('MKD');
   const [balance, setBalance] = useState('0');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isOther = selectedBank === OTHER_BANK;
+  const bankName = isOther ? customBank.trim() : selectedBank;
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -59,8 +64,25 @@ export function AddBankAccountModal({ onClose, onCreated }: Props) {
       <form onSubmit={handleSubmit}>
         <label>
           {t('accounts.bankName')}
-          <input value={bankName} onChange={(e) => setBankName(e.target.value)} required autoFocus />
+          <select value={selectedBank} onChange={(e) => setSelectedBank(e.target.value)} required autoFocus>
+            <option value="" disabled>
+              {t('accounts.bankPlaceholder')}
+            </option>
+            {MACEDONIAN_BANKS.map((bank) => (
+              <option key={bank} value={bank}>
+                {bank}
+              </option>
+            ))}
+            <option value={OTHER_BANK}>{t('accounts.bankOther')}</option>
+          </select>
         </label>
+
+        {isOther && (
+          <label>
+            {t('accounts.bankOtherName')}
+            <input value={customBank} onChange={(e) => setCustomBank(e.target.value)} required autoFocus />
+          </label>
+        )}
         <label>
           {t('accounts.iban')}
           <input

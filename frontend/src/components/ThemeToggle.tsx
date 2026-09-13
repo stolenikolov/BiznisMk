@@ -10,7 +10,7 @@ export function ThemeToggle() {
   const next: Theme = theme === 'dark' ? 'light' : 'dark';
 
   const handleClick = () => {
-    applyTheme(next);
+    applyTheme(next, { animate: true });
     setTheme(next);
   };
 
