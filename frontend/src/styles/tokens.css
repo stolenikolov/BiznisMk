@@ -16,11 +16,14 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
 
-  /* Weights — capped at 590 on purpose. */
+  /* One family carries the whole hierarchy, so weight does the work a second
+     typeface used to. Headlines are genuinely bold now. */
   --weight-light: 300;
   --weight-regular: 400;
-  --weight-medium: 510;
-  --weight-strong: 590;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-heavy: 800;
 
   /* Type scale (Minor Third from a 16px base) with Linear's tracking. */
   --text-display: clamp(2.75rem, 6vw, 4.5rem);

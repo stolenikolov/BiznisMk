@@ -12,6 +12,9 @@
   "nav": {
     "sections": "Делови",
     "company": "Компанија",
+    "search": "Пребарај",
+    "notifications": "Известувања",
+    "transactions": "Трансакции",
     "dashboard": "Преглед",
     "finance": "Финансии",
     "employees": "Вработени",
@@ -126,6 +129,60 @@
     "AD": "АД",
     "TP": "ТП (трговец поединец)",
     "OTHER": "Друго"
+  },
+  "overview": {
+    "greeting": {
+      "morning": "Добро утро, {{name}}.",
+      "afternoon": "Добро попладне, {{name}}.",
+      "evening": "Добра вечер, {{name}}."
+    },
+    "subtext": "Целосен преглед на финансиите и тимот на {{company}}.",
+    "yourCompany": "твојата компанија",
+    "range": "Период",
+    "thisMonth": "Овој месец",
+    "thisQuarter": "Ова тромесечје",
+    "thisYear": "Оваа година",
+    "exportReport": "Извези извештај",
+    "acrossAccounts_one": "Пресметано преку {{count}} поврзана сметка",
+    "acrossAccounts_other": "Пресметано преку {{count}} поврзани сметки",
+    "stats": {
+      "income": "Месечен приход",
+      "expenses": "Месечни трошоци",
+      "profit": "Нето добивка"
+    },
+    "spendingByCategory": "Трошоци по категорија",
+    "categories": {
+      "salaries": "Плати",
+      "rent": "Наем",
+      "software": "Софтвер",
+      "logistics": "Логистика",
+      "other": "Останато",
+      "invoice": "Фактура"
+    },
+    "cashFlow": "Тренд на парични текови",
+    "income": "Приход",
+    "expense": "Расход",
+    "ranges": {
+      "1y": "1Г",
+      "6m": "6М",
+      "1m": "1М"
+    },
+    "recentTransactions": "Последни трансакции",
+    "seeAll": "Види ги сите →"
+  },
+  "months": {
+    "jan": "јан",
+    "feb": "фев",
+    "mar": "мар",
+    "apr": "апр",
+    "may": "мај",
+    "jun": "јун",
+    "jul": "јул",
+    "aug": "авг",
+    "sep": "сеп",
+    "oct": "окт",
+    "nov": "ное",
+    "dec": "дек"
   },
   "dashboard": {
     "title": "Преглед на компанијата",

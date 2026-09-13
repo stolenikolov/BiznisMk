@@ -52,6 +52,34 @@ export function ImageIcon() {
   );
 }
 
+export function SearchIcon() {
+  return (
+    <svg {...ICON_PROPS} aria-hidden="true">
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="M16 16l4.5 4.5" />
+    </svg>
+  );
+}
+
+export function BellIcon() {
+  return (
+    <svg {...ICON_PROPS} aria-hidden="true">
+      <path d="M6.5 9.5a5.5 5.5 0 0111 0c0 4 1.5 5.5 1.5 5.5H5s1.5-1.5 1.5-5.5z" />
+      <path d="M10 18.5a2 2 0 004 0" />
+    </svg>
+  );
+}
+
+/** Generic placeholder avatar — real profile photos come later. */
+export function PersonIcon() {
+  return (
+    <svg {...ICON_PROPS} aria-hidden="true">
+      <circle cx="12" cy="9" r="3.2" />
+      <path d="M5.5 19.5c0-3.3 2.9-5.8 6.5-5.8s6.5 2.5 6.5 5.8" />
+    </svg>
+  );
+}
+
 export function SunIcon() {
   return (
     <svg {...ICON_PROPS} aria-hidden="true">

@@ -25,7 +25,7 @@ h2,
 h3 {
   margin: 0;
   color: var(--text-primary);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--track-subheading);
   line-height: 1.15;
 }
@@ -74,10 +74,10 @@ a {
   }
 }
 
-/* Display type — oversized, tight, never bold. */
+/* Display type — one family, so weight carries the hierarchy. */
 .type-hero {
   font-size: var(--text-hero);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-heavy);
   letter-spacing: var(--track-display);
   line-height: 1;
   color: var(--text-primary);
@@ -85,7 +85,7 @@ a {
 
 .type-heading {
   font-size: var(--text-heading);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-bold);
   letter-spacing: var(--track-display);
   line-height: 1.05;
   color: var(--text-primary);
@@ -93,7 +93,7 @@ a {
 
 .page-title {
   font-size: var(--text-subheading);
-  font-weight: var(--weight-regular);
+  font-weight: var(--weight-bold);
   letter-spacing: var(--track-subheading);
   line-height: 1.13;
   color: var(--text-primary);
@@ -101,14 +101,22 @@ a {
 
 .kpi-value {
   font-size: var(--text-subheading);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-bold);
   letter-spacing: var(--track-display);
   line-height: 1;
   color: var(--text-primary);
 }
 
-/* Small caption/label type. */
+/* Italic emphasis — the wordmark and an emphasised word in a headline. */
+.type-emphasis {
+  font-style: italic;
+  font-weight: var(--weight-regular);
+}
+
+/* Small uppercase technical labels — eyebrow tags and stat micro-labels.
+   The one place the mono face appears outside figures. */
 .label-caps {
+  font-family: var(--font-mono);
   font-size: var(--text-label);
   font-weight: var(--weight-regular);
   letter-spacing: 0.08em;

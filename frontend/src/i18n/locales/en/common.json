@@ -12,6 +12,9 @@
   "nav": {
     "sections": "Sections",
     "company": "Company",
+    "search": "Search",
+    "notifications": "Notifications",
+    "transactions": "Transactions",
     "dashboard": "Overview",
     "finance": "Finance",
     "employees": "Employees",
@@ -126,6 +129,60 @@
     "AD": "AD (joint-stock)",
     "TP": "TP (sole trader)",
     "OTHER": "Other"
+  },
+  "overview": {
+    "greeting": {
+      "morning": "Good morning, {{name}}.",
+      "afternoon": "Good afternoon, {{name}}.",
+      "evening": "Good evening, {{name}}."
+    },
+    "subtext": "A full view of {{company}}'s finances and team.",
+    "yourCompany": "your company",
+    "range": "Period",
+    "thisMonth": "This month",
+    "thisQuarter": "This quarter",
+    "thisYear": "This year",
+    "exportReport": "Export report",
+    "acrossAccounts_one": "Across {{count}} linked account",
+    "acrossAccounts_other": "Across {{count}} linked accounts",
+    "stats": {
+      "income": "Monthly income",
+      "expenses": "Monthly expenses",
+      "profit": "Net profit"
+    },
+    "spendingByCategory": "Spending by category",
+    "categories": {
+      "salaries": "Salaries",
+      "rent": "Rent",
+      "software": "Software",
+      "logistics": "Logistics",
+      "other": "Other",
+      "invoice": "Invoice"
+    },
+    "cashFlow": "Cash flow trend",
+    "income": "Income",
+    "expense": "Expenses",
+    "ranges": {
+      "1y": "1Y",
+      "6m": "6M",
+      "1m": "1M"
+    },
+    "recentTransactions": "Recent transactions",
+    "seeAll": "See all →"
+  },
+  "months": {
+    "jan": "Jan",
+    "feb": "Feb",
+    "mar": "Mar",
+    "apr": "Apr",
+    "may": "May",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep",
+    "oct": "Oct",
+    "nov": "Nov",
+    "dec": "Dec"
   },
   "dashboard": {
     "title": "Company overview",

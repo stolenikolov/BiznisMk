@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { formatAmount, maskAccount, useBankAccounts } from '../lib/useBankAccounts.ts';
 import { AddBankAccountModal } from '../components/AddBankAccountModal.tsx';
 
-export function DashboardPage() {
+export function AccountsPage() {
   const { t, i18n } = useTranslation();
   const { totals, accounts, isLoading, reload } = useBankAccounts();
   const [isAdding, setIsAdding] = useState(false);
@@ -35,9 +35,6 @@ export function DashboardPage() {
 
       <div className="accounts-strip-header">
         <h2>{t('accounts.linked')}</h2>
-        <Link to="/finance/accounts" className="link-arrow">
-          {t('accounts.viewIndividually')}
-        </Link>
       </div>
 
       <div className="accounts-strip">

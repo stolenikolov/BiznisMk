@@ -4,8 +4,8 @@ import { DashboardLayout } from '../layouts/DashboardLayout.tsx';
 import { PublicOnlyRoute } from '../auth/PublicOnlyRoute.tsx';
 import { RequireAuth } from '../auth/RequireAuth.tsx';
 import { LandingPage } from '../pages/LandingPage.tsx';
-import { DashboardPage } from '../pages/DashboardPage.tsx';
-import { BankAccountsPage } from '../pages/BankAccountsPage.tsx';
+import { OverviewPage } from '../pages/OverviewPage.tsx';
+import { AccountsPage } from '../pages/AccountsPage.tsx';
 import { BankAccountDetailPage } from '../pages/BankAccountDetailPage.tsx';
 import { CompanySettingsPage } from '../pages/CompanySettingsPage.tsx';
 import { SectionStubPage } from '../pages/SectionStubPage.tsx';
@@ -33,10 +33,11 @@ export const router = createBrowserRouter([
       {
         element: <DashboardLayout />,
         children: [
-          { path: '/dashboard', element: <DashboardPage /> },
+          { path: '/dashboard', element: <OverviewPage /> },
           { path: '/finance', element: <SectionStubPage section="finance" /> },
-          { path: '/finance/accounts', element: <BankAccountsPage /> },
+          { path: '/finance/accounts', element: <AccountsPage /> },
           { path: '/finance/accounts/:accountId', element: <BankAccountDetailPage /> },
+          { path: '/finance/transactions', element: <SectionStubPage section="transactions" /> },
           { path: '/employees', element: <SectionStubPage section="employees" /> },
           { path: '/invoices', element: <SectionStubPage section="invoices" /> },
           { path: '/schedule', element: <SectionStubPage section="schedule" /> },

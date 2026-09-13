@@ -475,7 +475,7 @@ form button[type='submit'] {
 
 .modal-title {
   font-size: var(--text-title);
-  font-weight: var(--weight-medium);
+  font-weight: var(--weight-semibold);
   letter-spacing: var(--track-subheading);
   color: var(--text-primary);
   margin-bottom: var(--space-6);

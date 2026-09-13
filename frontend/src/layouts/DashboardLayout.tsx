@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/LanguageSwitcher.tsx';
 import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { CompanySwitcher } from '../components/CompanySwitcher.tsx';
+import { BellIcon, PersonIcon, SearchIcon } from '../components/icons.tsx';
 import { useAuth } from '../auth/useAuth.ts';
 
 /** Main sections of the app, drawn from the agreed feature scope. */
@@ -17,7 +18,7 @@ const SECTIONS = [
 
 export function DashboardLayout() {
   const { t } = useTranslation();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -27,33 +28,39 @@ export function DashboardLayout() {
 
   return (
     <div className="shell">
-      <header className="shell-header">
-        <span className="brand">{t('app.name')}</span>
-        <div className="shell-header-actions">
+      {/* Navigation runs across the top: wordmark and tabs left, tools right. */}
+      <header className="topnav">
+        <div className="topnav-left">
+          <span className="brand">{t('app.name')}</span>
+          <nav className="topnav-tabs" aria-label={t('nav.sections')}>
+            {SECTIONS.map((section) => (
+              <NavLink key={section.to} to={section.to} end={section.to === '/dashboard'}>
+                {t(`nav.${section.key}`)}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+
+        <div className="topnav-right">
           <CompanySwitcher />
-          {user?.role && <span className="badge">{t(`role.${user.role}`)}</span>}
+          <button type="button" className="icon-button" aria-label={t('nav.search')}>
+            <SearchIcon />
+          </button>
+          <button type="button" className="icon-button has-unread" aria-label={t('nav.notifications')}>
+            <BellIcon />
+          </button>
           <LanguageSwitcher />
           <ThemeToggle />
-          <button type="button" className="btn-quiet" onClick={() => void handleLogout()}>
-            {t('nav.logout')}
+          <span className="topnav-divider" aria-hidden="true" />
+          <button type="button" className="avatar-button" onClick={() => void handleLogout()} title={t('nav.logout')}>
+            <PersonIcon />
           </button>
         </div>
       </header>
 
-      <div className="shell-body">
-        {/* Tabs sit on the left of the shell. */}
-        <nav className="shell-nav" aria-label={t('nav.sections')}>
-          {SECTIONS.map((section) => (
-            <NavLink key={section.to} to={section.to} end={section.to === '/dashboard'}>
-              {t(`nav.${section.key}`)}
-            </NavLink>
-          ))}
-        </nav>
-
-        <main className="shell-content">
-          <Outlet />
-        </main>
-      </div>
+      <main className="shell-content">
+        <Outlet />
+      </main>
     </div>
   );
 }

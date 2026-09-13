@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next';
 
+type Section = 'finance' | 'employees' | 'invoices' | 'schedule' | 'transactions';
+
 /** Placeholder for a section whose screens aren't built yet. */
-export function SectionStubPage({ section }: { section: 'finance' | 'employees' | 'invoices' | 'schedule' }) {
+export function SectionStubPage({ section }: { section: Section }) {
   const { t } = useTranslation();
 
   return (
