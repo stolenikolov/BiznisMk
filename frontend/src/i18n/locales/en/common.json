@@ -30,7 +30,8 @@
   },
   "accounts": {
     "title": "Transaction accounts",
-    "addCta": "Add transaction account",
+    "linked": "Linked accounts",
+    "addCta": "Add account",
     "addTitle": "New transaction account",
     "viewIndividually": "View accounts individually",
     "bankName": "Bank",
@@ -43,6 +44,15 @@
     "openingBalance": "Opening balance",
     "balanceHint": "For example: 1250.50",
     "save": "Save account",
+    "saving": "Saving...",
+    "verifying": "Checking with the bank...",
+    "verifyFailed": "The bank did not recognise this account. Check the number and try again.",
+    "verifyNoFunds": "The account was verified but holds too little to track.",
+    "balanceFromBank": "The balance is taken from the bank during the check.",
+    "transactions": "Transactions",
+    "transactionsPending": "Transaction history arrives with the finance module.",
+    "notFound": "Account not found",
+    "backToList": "Back to accounts",
     "empty": "No accounts registered yet."
   },
   "language": {

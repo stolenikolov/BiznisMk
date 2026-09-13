@@ -38,6 +38,12 @@ export function useBankAccounts() {
   return { accounts, totals, isLoading, reload: load };
 }
 
+/** Shows only the last four characters, the way a bank statement would. */
+export function maskAccount(iban: string): string {
+  const trimmed = iban.trim();
+  return trimmed.length <= 4 ? trimmed : `•••• ${trimmed.slice(-4)}`;
+}
+
 /**
  * Formats a decimal string for display.
  *

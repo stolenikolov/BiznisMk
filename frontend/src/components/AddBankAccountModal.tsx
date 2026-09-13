@@ -28,31 +28,50 @@ export function AddBankAccountModal({ onClose, onCreated }: Props) {
   const [customBank, setCustomBank] = useState('');
   const [iban, setIban] = useState('');
   const [currency, setCurrency] = useState<string>('MKD');
-  const [balance, setBalance] = useState('0');
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [stage, setStage] = useState<'idle' | 'verifying' | 'saving'>('idle');
 
   const isOther = selectedBank === OTHER_BANK;
   const bankName = isOther ? customBank.trim() : selectedBank;
+  const isSubmitting = stage !== 'idle';
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    setIsSubmitting(true);
+    // The API rejects spaces; IBANs are usually written in groups of four.
+    const normalizedIban = iban.replace(/\s+/g, '').toUpperCase();
+
     try {
+      setStage('verifying');
+      const { data: check } = await api.post<{
+        verified: boolean;
+        hasSufficientFunds: boolean;
+        mockBalance: string;
+      }>('/bank-verification/check-account', { bankName, iban: normalizedIban });
+
+      if (!check.verified) {
+        setError(t('accounts.verifyFailed'));
+        return;
+      }
+      if (!check.hasSufficientFunds) {
+        setError(t('accounts.verifyNoFunds'));
+        return;
+      }
+
+      setStage('saving');
       await api.post('/bank-accounts', {
         bankName,
-        // The API rejects spaces; IBANs are usually written in groups of four.
-        iban: iban.replace(/\s+/g, '').toUpperCase(),
+        iban: normalizedIban,
         currency,
-        balance,
+        // The bank is the authority on what is actually on the account.
+        balance: check.mockBalance,
       });
       onCreated();
       onClose();
     } catch (err) {
       setError(extractErrorMessage(err));
     } finally {
-      setIsSubmitting(false);
+      setStage('idle');
     }
   };
 
@@ -92,36 +111,37 @@ export function AddBankAccountModal({ onClose, onCreated }: Props) {
             required
           />
         </label>
-        <div className="form-row">
-          <label>
-            {t('accounts.currency')}
-            <select value={currency} onChange={(e) => setCurrency(e.target.value)} required>
-              {CURRENCIES.map((code) => (
-                <option key={code} value={code}>
-                  {code}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('accounts.openingBalance')}
-            <input
-              value={balance}
-              onChange={(e) => setBalance(e.target.value)}
-              inputMode="decimal"
-              pattern="\d+([.,]\d{1,2})?"
-              title={t('accounts.balanceHint')}
-              required
-            />
-          </label>
-        </div>
+        <label>
+          {t('accounts.currency')}
+          <select value={currency} onChange={(e) => setCurrency(e.target.value)} required>
+            {CURRENCIES.map((code) => (
+              <option key={code} value={code}>
+                {code}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {/* No manual balance field: the bank check is what reports it. */}
+        <span className="field-hint">{t('accounts.balanceFromBank')}</span>
+
+        {stage === 'verifying' && (
+          <p className="verify-status" role="status">
+            {t('accounts.verifying')}
+          </p>
+        )}
+
         {error && (
           <p role="alert" className="form-error">
             {error}
           </p>
         )}
         <button type="submit" className="btn-primary" disabled={isSubmitting}>
-          {t('accounts.save')}
+          {stage === 'verifying'
+            ? t('accounts.verifying')
+            : stage === 'saving'
+              ? t('accounts.saving')
+              : t('accounts.save')}
         </button>
       </form>
     </Modal>
