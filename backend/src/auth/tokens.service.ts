@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { Response } from 'express';
+import { randomUUID } from 'node:crypto';
 import ms from 'ms';
 import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from './constants.js';
 import type { AccessTokenPayload, RefreshTokenPayload } from './types/jwt-payload.type.js';
@@ -20,11 +21,15 @@ export class TokensService {
     });
   }
 
+  /** `jti` keeps tokens issued in the same second from hashing identically. */
   signRefreshToken(payload: RefreshTokenPayload): string {
-    return this.jwtService.sign(payload, {
-      secret: this.configService.getOrThrow<string>('jwt.refreshSecret', { infer: true }),
-      expiresIn: this.refreshExpiresIn(),
-    });
+    return this.jwtService.sign(
+      { ...payload, jti: randomUUID() },
+      {
+        secret: this.configService.getOrThrow<string>('jwt.refreshSecret', { infer: true }),
+        expiresIn: this.refreshExpiresIn(),
+      },
+    );
   }
 
   verifyRefreshToken(token: string): RefreshTokenPayload {

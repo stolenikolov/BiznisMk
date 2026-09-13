@@ -1,6 +1,8 @@
 import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { NormalizeEmail } from './normalize-email.js';
 
 export class RegisterDto {
+  @NormalizeEmail()
   @IsEmail()
   email!: string;
 
