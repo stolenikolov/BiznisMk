@@ -6,7 +6,8 @@ import { PrismaModule } from './prisma/prisma.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { CompaniesModule } from './companies/companies.module.js';
 import { BankAccountsModule } from './bank-accounts/bank-accounts.module.js';
-import { BankVerificationModule } from './bank-verification/bank-verification.module.js';
+import { BankIntegrationModule } from './bank-integration/bank-integration.module.js';
+import { TransactionsModule } from './transactions/transactions.module.js';
 import { envValidationSchema } from './config/env.validation.js';
 import appConfig from './config/app.config.js';
 import jwtConfig from './config/jwt.config.js';
@@ -23,7 +24,8 @@ import jwtConfig from './config/jwt.config.js';
     AuthModule,
     CompaniesModule,
     BankAccountsModule,
-    BankVerificationModule,
+    BankIntegrationModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -89,6 +89,7 @@ model Company {
   invoices     Invoice[]
   schedules    Schedule[]
   bankAccounts BankAccount[]
+  transactions Transaction[]
 
   @@map("companies")
 }
@@ -105,11 +106,48 @@ model BankAccount {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 
   @@unique([companyId, iban])
   @@index([companyId])
   @@map("bank_accounts")
+}
+
+enum TransactionDirection {
+  IN
+  OUT
+}
+
+enum TransactionCategory {
+  SALARIES
+  RENT
+  SOFTWARE
+  LOGISTICS
+  INVOICE
+  OTHER
+}
+
+/// A booked bank transaction. Rows arrive from whatever bank integration is
+/// connected — today that is the mock provider, later a real open-banking
+/// feed — so everything downstream reads the same shape either way.
+model Transaction {
+  id            String               @id @default(uuid())
+  companyId     String
+  bankAccountId String               @map("bank_account_id")
+  description   String
+  category      TransactionCategory  @default(OTHER)
+  direction     TransactionDirection
+  amount        Decimal              @db.Decimal(14, 2)
+  bookedAt      DateTime             @map("booked_at")
+  createdAt     DateTime             @default(now())
+
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  bankAccount BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, bookedAt])
+  @@index([bankAccountId])
+  @@map("transactions")
 }
 
 /// Role a user holds inside one company. CEO is the top role and is what a
