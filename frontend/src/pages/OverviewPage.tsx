@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { formatAmount, useBankAccounts } from '../lib/useBankAccounts.ts';
-import { CashFlowChart } from '../components/CashFlowChart.tsx';
-import {
-  PLACEHOLDER_BALANCE_DELTA,
-  PLACEHOLDER_CASH_FLOW,
-  PLACEHOLDER_CATEGORIES,
-  PLACEHOLDER_MINI_STATS,
-  PLACEHOLDER_TRANSACTIONS,
-} from '../lib/overviewPlaceholderData.ts';
+import { useOverview } from '../lib/useOverview.ts';
+import { FinanceIcon, InvoiceIcon } from '../components/icons.tsx';
+
+// ECharts is large and only this card needs it, so it loads on demand rather
+// than riding along in the initial bundle.
+const CashFlowChart = lazy(() =>
+  import('../components/CashFlowChart.tsx').then((module) => ({ default: module.CashFlowChart })),
+);
 
 const RANGES = ['1y', '6m', '1m'] as const;
+const RANGE_MONTHS: Record<(typeof RANGES)[number], number> = { '1y': 12, '6m': 6, '1m': 1 };
 
 function greetingKey(hour = new Date().getHours()): 'morning' | 'afternoon' | 'evening' {
   if (hour < 12) return 'morning';
@@ -20,22 +21,42 @@ function greetingKey(hour = new Date().getHours()): 'morning' | 'afternoon' | 'e
   return 'evening';
 }
 
-function Delta({ percent }: { percent: number }) {
-  const positive = percent >= 0;
+/** Rendered only when there is something to compare against. */
+function Delta({ percent, invert = false }: { percent: number | null; invert?: boolean }) {
+  if (percent === null) return null;
+  const good = invert ? percent <= 0 : percent >= 0;
   return (
-    <span className={`delta${positive ? '' : ' is-negative'}`}>
-      {positive ? '▲' : '▼'} {Math.abs(percent).toFixed(1)}%
+    <span className={`delta${good ? '' : ' is-negative'}`}>
+      {percent >= 0 ? '▲' : '▼'} {Math.abs(percent).toFixed(1)}%
     </span>
+  );
+}
+
+function EmptyState({ icon, message, action }: { icon: React.ReactNode; message: string; action?: React.ReactNode }) {
+  return (
+    <div className="empty-state">
+      <span className="empty-state-icon">{icon}</span>
+      <p>{message}</p>
+      {action}
+    </div>
   );
 }
 
 export function OverviewPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const { totals, accounts, isLoading } = useBankAccounts();
+  const { totals, accounts } = useBankAccounts();
+  const { overview, isLoading } = useOverview();
   const [range, setRange] = useState<(typeof RANGES)[number]>('1y');
 
   const [headline] = totals;
+  const cashFlow = overview.cashFlow.slice(-RANGE_MONTHS[range]);
+
+  const stats = [
+    { key: 'income', amount: overview.monthly.income, delta: overview.deltas.income, invert: false },
+    { key: 'expenses', amount: overview.monthly.expenses, delta: overview.deltas.expenses, invert: true },
+    { key: 'profit', amount: overview.monthly.profit, delta: overview.deltas.profit, invert: false },
+  ] as const;
 
   return (
     <div className="overview">
@@ -65,24 +86,21 @@ export function OverviewPage() {
           <span className="label-caps">{t('dashboard.totalBalance')}</span>
           <div className="balance-panel-figure">
             <span className="balance-hero-figure">
-              {isLoading
-                ? '—'
-                : headline
-                  ? `${formatAmount(headline.total, i18n.language)} ${headline.currency}`
-                  : '0,00 MKD'}
+              {headline
+                ? `${formatAmount(headline.total, i18n.language)} ${headline.currency}`
+                : '0,00 MKD'}
             </span>
-            <Delta percent={PLACEHOLDER_BALANCE_DELTA} />
           </div>
-          <p className="overview-subtext">
-            {t('overview.acrossAccounts', { count: accounts.length })}
-          </p>
+          <p className="overview-subtext">{t('overview.acrossAccounts', { count: accounts.length })}</p>
 
           <div className="mini-stats">
-            {PLACEHOLDER_MINI_STATS.map((stat) => (
+            {stats.map((stat) => (
               <div key={stat.key} className="mini-stat">
                 <span className="label-caps">{t(`overview.stats.${stat.key}`)}</span>
-                <span className="mini-stat-figure">{formatAmount(stat.amount, i18n.language)}</span>
-                <Delta percent={stat.key === 'expenses' ? -stat.deltaPercent : stat.deltaPercent} />
+                <span className="mini-stat-figure">
+                  {formatAmount(stat.amount, i18n.language)} MKD
+                </span>
+                <Delta percent={stat.delta} invert={stat.invert} />
               </div>
             ))}
           </div>
@@ -92,23 +110,27 @@ export function OverviewPage() {
           <div className="card-header">
             <h2>{t('overview.spendingByCategory')}</h2>
           </div>
-          <ul className="category-list">
-            {PLACEHOLDER_CATEGORIES.map((category, index) => (
-              <li key={category.key}>
-                <div className="category-row">
-                  <span>{t(`overview.categories.${category.key}`)}</span>
-                  <span className="num">{category.percent}%</span>
-                </div>
-                {/* One accent, fading by rank — not a different hue per row. */}
-                <span className="category-bar">
-                  <span
-                    style={{ width: `${category.percent}%`, opacity: 1 - index * 0.16 }}
-                    aria-hidden="true"
-                  />
-                </span>
-              </li>
-            ))}
-          </ul>
+          {overview.categories.length === 0 ? (
+            <EmptyState icon={<FinanceIcon />} message={t('overview.empty.categories')} />
+          ) : (
+            <ul className="category-list">
+              {overview.categories.map((category, index) => (
+                <li key={category.category}>
+                  <div className="category-row">
+                    <span>{t(`overview.categories.${category.category.toLowerCase()}`)}</span>
+                    <span className="num">{category.percent}%</span>
+                  </div>
+                  {/* One accent, fading by rank — not a different hue per row. */}
+                  <span className="category-bar">
+                    <span
+                      style={{ width: `${category.percent}%`, opacity: 1 - index * 0.16 }}
+                      aria-hidden="true"
+                    />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
 
@@ -135,33 +157,57 @@ export function OverviewPage() {
               ))}
             </div>
           </div>
-          <CashFlowChart points={PLACEHOLDER_CASH_FLOW} />
+          {overview.hasData ? (
+            <Suspense fallback={<div className="empty-state">{t('common.loading')}</div>}>
+              <CashFlowChart points={cashFlow} />
+            </Suspense>
+          ) : (
+            <EmptyState icon={<FinanceIcon />} message={t('overview.empty.cashFlow')} />
+          )}
         </section>
 
         <section className="card">
           <div className="card-header">
             <h2>{t('overview.recentTransactions')}</h2>
-            <Link to="/finance/transactions" className="link-arrow">
-              {t('overview.seeAll')}
-            </Link>
+            {overview.recentTransactions.length > 0 && (
+              <Link to="/finance/transactions" className="link-arrow">
+                {t('overview.seeAll')}
+              </Link>
+            )}
           </div>
-          <ul className="transaction-list">
-            {PLACEHOLDER_TRANSACTIONS.map((transaction) => (
-              <li key={transaction.id}>
-                <div className="transaction-main">
-                  <span className="transaction-description">{transaction.description}</span>
-                  <span className="badge">{t(`overview.categories.${transaction.categoryKey}`)}</span>
-                </div>
-                <div className="transaction-meta">
-                  <span className="num transaction-date">{transaction.date}</span>
-                  <span className={`num transaction-amount${transaction.direction === 'out' ? ' is-negative' : ''}`}>
-                    {transaction.direction === 'out' ? '−' : '+'}
-                    {formatAmount(transaction.amount, i18n.language)}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {overview.recentTransactions.length === 0 ? (
+            <EmptyState
+              icon={<InvoiceIcon />}
+              message={isLoading ? t('common.loading') : t('overview.empty.transactions')}
+              action={
+                !isLoading && (
+                  <Link to="/finance/accounts" className="btn-ghost">
+                    {t('accounts.addCta')}
+                  </Link>
+                )
+              }
+            />
+          ) : (
+            <ul className="transaction-list">
+              {overview.recentTransactions.map((transaction) => (
+                <li key={transaction.id}>
+                  <div className="transaction-main">
+                    <span className="transaction-description">{transaction.description}</span>
+                    <span className="badge">{t(`overview.categories.${transaction.category.toLowerCase()}`)}</span>
+                  </div>
+                  <div className="transaction-meta">
+                    <span className="num transaction-date">{transaction.bookedAt}</span>
+                    <span
+                      className={`num transaction-amount${transaction.direction === 'OUT' ? ' is-negative' : ''}`}
+                    >
+                      {transaction.direction === 'OUT' ? '−' : '+'}
+                      {formatAmount(transaction.amount, i18n.language)}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
     </div>

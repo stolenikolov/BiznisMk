@@ -7,6 +7,7 @@ import { LandingPage } from '../pages/LandingPage.tsx';
 import { OverviewPage } from '../pages/OverviewPage.tsx';
 import { AccountsPage } from '../pages/AccountsPage.tsx';
 import { BankAccountDetailPage } from '../pages/BankAccountDetailPage.tsx';
+import { TransactionsPage } from '../pages/TransactionsPage.tsx';
 import { CompanySettingsPage } from '../pages/CompanySettingsPage.tsx';
 import { SectionStubPage } from '../pages/SectionStubPage.tsx';
 import { NotFoundPage } from '../pages/NotFoundPage.tsx';
@@ -37,7 +38,7 @@ export const router = createBrowserRouter([
           { path: '/finance', element: <SectionStubPage section="finance" /> },
           { path: '/finance/accounts', element: <AccountsPage /> },
           { path: '/finance/accounts/:accountId', element: <BankAccountDetailPage /> },
-          { path: '/finance/transactions', element: <SectionStubPage section="transactions" /> },
+          { path: '/finance/transactions', element: <TransactionsPage /> },
           { path: '/employees', element: <SectionStubPage section="employees" /> },
           { path: '/invoices', element: <SectionStubPage section="invoices" /> },
           { path: '/schedule', element: <SectionStubPage section="schedule" /> },

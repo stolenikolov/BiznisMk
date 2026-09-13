@@ -14,6 +14,8 @@
     "company": "Компанија",
     "search": "Пребарај",
     "notifications": "Известувања",
+    "notificationsUnread_one": "Известувања ({{count}} непрочитано)",
+    "notificationsUnread_other": "Известувања ({{count}} непрочитани)",
     "transactions": "Трансакции",
     "dashboard": "Преглед",
     "finance": "Финансии",
@@ -168,7 +170,13 @@
       "1m": "1М"
     },
     "recentTransactions": "Последни трансакции",
-    "seeAll": "Види ги сите →"
+    "seeAll": "Види ги сите →",
+    "chartHint": "Тркалце за зум, повлечи за придвижување.",
+    "empty": {
+      "categories": "Нема трошоци за прикажување",
+      "cashFlow": "Нема податоци за избраниот период",
+      "transactions": "Нема трансакции сè уште"
+    }
   },
   "months": {
     "jan": "јан",

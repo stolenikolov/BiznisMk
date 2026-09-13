@@ -5,6 +5,7 @@ import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { CompanySwitcher } from '../components/CompanySwitcher.tsx';
 import { BellIcon, PersonIcon, SearchIcon } from '../components/icons.tsx';
 import { useAuth } from '../auth/useAuth.ts';
+import { useUnreadNotifications } from '../lib/useNotifications.ts';
 
 /** Main sections of the app, drawn from the agreed feature scope. */
 const SECTIONS = [
@@ -20,6 +21,7 @@ export function DashboardLayout() {
   const { t } = useTranslation();
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const unreadCount = useUnreadNotifications();
 
   const handleLogout = async () => {
     await logout();
@@ -46,7 +48,16 @@ export function DashboardLayout() {
           <button type="button" className="icon-button" aria-label={t('nav.search')}>
             <SearchIcon />
           </button>
-          <button type="button" className="icon-button has-unread" aria-label={t('nav.notifications')}>
+          {/* The dot appears only when something is actually unread. */}
+          <button
+            type="button"
+            className={`icon-button${unreadCount > 0 ? ' has-unread' : ''}`}
+            aria-label={
+              unreadCount > 0
+                ? t('nav.notificationsUnread', { count: unreadCount })
+                : t('nav.notifications')
+            }
+          >
             <BellIcon />
           </button>
           <LanguageSwitcher />

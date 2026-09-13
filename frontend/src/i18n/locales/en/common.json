@@ -14,6 +14,8 @@
     "company": "Company",
     "search": "Search",
     "notifications": "Notifications",
+    "notificationsUnread_one": "Notifications ({{count}} unread)",
+    "notificationsUnread_other": "Notifications ({{count}} unread)",
     "transactions": "Transactions",
     "dashboard": "Overview",
     "finance": "Finance",
@@ -168,7 +170,13 @@
       "1m": "1M"
     },
     "recentTransactions": "Recent transactions",
-    "seeAll": "See all →"
+    "seeAll": "See all →",
+    "chartHint": "Scroll to zoom, drag to pan.",
+    "empty": {
+      "categories": "No spending to show",
+      "cashFlow": "No data for the selected period",
+      "transactions": "No transactions yet"
+    }
   },
   "months": {
     "jan": "Jan",
