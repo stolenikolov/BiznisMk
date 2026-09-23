@@ -1,0 +1,357 @@
+/* Settings — a section menu on the left, the section's cards on the right.
+   Layout only: every colour, radius and border comes from tokens.css. */
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.settings .page-header {
+  align-items: center;
+  margin-bottom: var(--space-1);
+}
+
+.settings .page-header .page-title {
+  margin-bottom: var(--space-1);
+}
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: start;
+}
+
+/* Section menu -------------------------------------------------------------------- */
+
+.settings-nav {
+  position: sticky;
+  top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.settings-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-nav-heading {
+  padding: 0 var(--space-3) var(--space-2);
+  font-size: 0.6875rem;
+  color: var(--text-faint);
+}
+
+.settings-nav a {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.settings-nav a:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+/* The current section: a lifted row with an accent rule on its left edge. */
+.settings-nav a.active {
+  background: var(--surface-2);
+  color: var(--text-primary);
+  box-shadow: var(--accent) 2px 0 0 0 inset;
+}
+
+/* Signing out and closing the account sit apart, under a rule. */
+.settings-nav-group--end {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--hairline);
+}
+
+/* A row like the links above it, but an action: it signs out, it does not open a section. */
+.settings-nav-logout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-control);
+  background: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.settings-nav-logout:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+.settings-nav-logout svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* Closing the account, in the danger colour. */
+.settings-nav a.is-danger,
+.settings-nav a.is-danger:hover,
+.settings-nav a.is-danger.active {
+  color: var(--danger);
+}
+
+.settings-nav a.is-danger:hover,
+.settings-nav a.is-danger.active {
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+}
+
+.settings-nav a.is-danger.active {
+  box-shadow: var(--danger) 2px 0 0 0 inset;
+}
+
+/* Back to the menu — only on a phone, where the menu is its own screen. */
+.settings-back {
+  display: none;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  padding: var(--space-2) 0;
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.settings-back svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Section content ------------------------------------------------------------------- */
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 720px;
+  min-width: 0;
+}
+
+.settings-card-head {
+  margin-bottom: var(--space-5);
+}
+
+.settings-card-head h2 {
+  margin-bottom: var(--space-1);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.settings-card-head p {
+  font-size: var(--text-caption);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Save sits right, under a hairline; its "saved" or error line sits left of it. */
+.settings-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  margin-top: var(--space-1);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--hairline);
+}
+
+.settings-card-actions p {
+  margin-right: auto;
+}
+
+form .settings-card-actions button[type='submit'] {
+  width: auto;
+  margin-top: 0;
+}
+
+.settings-saved {
+  font-size: var(--text-caption);
+  color: var(--tag-green);
+}
+
+/* ЕМБС / ЕДБ: values, not fields — there is nothing to click into. */
+.settings-readonly {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.settings-readonly dt {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.settings-readonly dd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.settings-readonly dd svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  color: var(--text-faint);
+}
+
+/* How an employee's inbox will show the email. */
+.settings-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+}
+
+.settings-preview .label-caps {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.settings-preview dl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.settings-preview dl > div {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: var(--space-3);
+  font-size: var(--text-body-sm);
+}
+
+.settings-preview dt {
+  color: var(--text-muted);
+}
+
+.settings-preview dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+}
+
+.settings-preview-address {
+  margin-left: var(--space-2);
+  color: var(--text-secondary);
+}
+
+.settings-warning {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--tag-amber) 12%, transparent);
+  font-size: var(--text-caption);
+  color: var(--tag-amber);
+}
+
+/* Closing the account ----------------------------------------------------------------- */
+
+.settings-card--danger {
+  box-shadow: color-mix(in srgb, var(--danger) 45%, transparent) 0 0 0 1px inset;
+}
+
+.settings-card--danger .settings-card-head h2 {
+  color: var(--danger);
+}
+
+.settings-danger-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-5);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.settings-danger-final {
+  margin-bottom: var(--space-5);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+@media (max-width: 760px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  /* Two screens instead of two columns: /settings is the menu, full width, and
+     a section replaces it with a way back. Nothing scrolls sideways. */
+  .settings-layout.is-menu-screen .settings-content,
+  .settings-layout:not(.is-menu-screen) .settings-nav {
+    display: none;
+  }
+
+  /* On a section, the back link does the title's job. */
+  .settings:has(.settings-layout:not(.is-menu-screen)) .page-header {
+    display: none;
+  }
+
+  .settings-nav {
+    position: static;
+  }
+
+  .settings-nav a,
+  .settings-nav-logout {
+    display: flex;
+    align-items: center;
+    padding: var(--space-4) var(--space-3);
+    font-size: var(--text-body);
+  }
+
+  /* Each section row leads somewhere, so it says so. */
+  .settings-nav a::after {
+    content: '›';
+    margin-left: auto;
+    font-size: var(--text-body-lg);
+    line-height: 1;
+    color: var(--text-faint);
+  }
+
+  .settings-nav a.active {
+    background: none;
+    box-shadow: none;
+  }
+
+  .settings-back {
+    display: inline-flex;
+  }
+
+  .settings-readonly,
+  .settings-preview dl > div {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-card-actions {
+    flex-wrap: wrap;
+  }
+}

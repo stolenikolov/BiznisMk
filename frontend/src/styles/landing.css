@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--section-gap);
-  padding-bottom: var(--space-32);
 }
 
 .landing-hero {
@@ -42,6 +41,8 @@
 /* Alternating band: copy on one side, product frame on the other. */
 
 .landing-band {
+  /* The footer links at these sections by id; leave air above the landing point. */
+  scroll-margin-top: var(--space-16);
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
   gap: var(--space-16);

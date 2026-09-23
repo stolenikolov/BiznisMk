@@ -7,8 +7,20 @@ import { MACEDONIAN_BANKS, OTHER_BANK } from '../lib/macedonianBanks.ts';
 
 const CURRENCIES = ['MKD', 'EUR', 'USD'] as const;
 
-function extractErrorMessage(err: unknown): string {
+/** The bank's refusals, in the reader's language; anything else as the server put it. */
+const ERROR_KEYS: Record<string, string> = {
+  ACCOUNT_LINKED_ELSEWHERE: 'accounts.linkedElsewhere',
+  BANK_ACCOUNT_NOT_FOUND: 'accounts.bankNoSuchAccount',
+  BANK_ACCOUNT_CLOSED: 'accounts.bankAccountClosed',
+  BANK_UNREACHABLE: 'accounts.bankUnavailable',
+  BANK_NOT_CONFIGURED: 'accounts.bankUnavailable',
+  BANK_BAD_RESPONSE: 'accounts.bankUnavailable',
+};
+
+function extractErrorMessage(err: unknown, t: (key: string) => string): string {
   if (axios.isAxiosError(err)) {
+    const key = ERROR_KEYS[err.response?.data?.errorCode as string];
+    if (key) return t(key);
     const message = err.response?.data?.message;
     if (Array.isArray(message)) return message.join(', ');
     if (typeof message === 'string') return message;
@@ -47,7 +59,7 @@ export function AddBankAccountModal({ onClose, onCreated }: Props) {
         verified: boolean;
         hasSufficientFunds: boolean;
         mockBalance: string;
-      }>('/bank-verification/check-account', { bankName, iban: normalizedIban });
+      }>('/bank-integration/check-account', { bankName, iban: normalizedIban });
 
       if (!check.verified) {
         setError(t('accounts.verifyFailed'));
@@ -69,7 +81,7 @@ export function AddBankAccountModal({ onClose, onCreated }: Props) {
       onCreated();
       onClose();
     } catch (err) {
-      setError(extractErrorMessage(err));
+      setError(extractErrorMessage(err, t));
     } finally {
       setStage('idle');
     }

@@ -1,4 +1,10 @@
-import type { BankAccountRef, BankStatement, BankVerificationResult } from './bank-integration.types.js';
+import type {
+  AccountLinkRequest,
+  AccountLinkResult,
+  BankAccountRef,
+  BankStatement,
+  BankVerificationResult,
+} from './bank-integration.types.js';
 
 /**
  * The seam between the app and whoever actually holds the money.
@@ -11,6 +17,13 @@ import type { BankAccountRef, BankStatement, BankVerificationResult } from './ba
 export abstract class BankIntegrationProvider {
   /** Confirms the account exists and is worth connecting. */
   abstract checkAccount(account: BankAccountRef): Promise<BankVerificationResult>;
+
+  /**
+   * Links the account to the company at the bank, which is the only one that
+   * can say whose account it is. Knowing an IBAN proves nothing — it is printed
+   * on every invoice — so nothing is connected without this.
+   */
+  abstract linkAccount(request: AccountLinkRequest): Promise<AccountLinkResult>;
 
   /** Balance plus booked history for a freshly connected account. */
   abstract fetchStatement(account: BankAccountRef): Promise<BankStatement>;

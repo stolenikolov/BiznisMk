@@ -43,6 +43,12 @@
   gap: var(--space-5);
 }
 
+/* A grid cell otherwise refuses to shrink below its content — a chart, a long
+   figure — and pushes the page sideways on a phone. */
+.overview-row > * {
+  min-width: 0;
+}
+
 .overview-row--balance {
   grid-template-columns: 2fr 1fr;
 }
@@ -71,9 +77,17 @@
   color: var(--negative);
 }
 
+/* What the change is measured against — it moves with the period select. */
+.delta-context {
+  font-weight: var(--weight-regular);
+  color: var(--text-faint);
+}
+
+/* Three across while they fit, fewer when they do not: a figure like
+   "1.234.617 MKD" must never be squeezed onto two lines. */
 .mini-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: var(--space-5);
   margin-top: var(--space-6);
 }
@@ -87,6 +101,7 @@
 }
 
 .mini-stat-figure {
+  white-space: nowrap;
   font-size: var(--text-body-lg);
   font-weight: var(--weight-semibold);
   letter-spacing: var(--track-subheading);
@@ -311,4 +326,26 @@
 
 .transaction-amount.is-negative {
   color: var(--negative);
+}
+
+/* Here rather than in layout.css: this file loads later, so a rule there for
+   these rows was always overridden by the two-column ones above. */
+@media (max-width: 900px) {
+  .overview-row--balance,
+  .overview-row--flow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Date over amount, so the description keeps the width. */
+  .transaction-meta {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-1);
+  }
+
+  .overview-head-actions {
+    flex-wrap: wrap;
+  }
 }

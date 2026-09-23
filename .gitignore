@@ -37,3 +37,6 @@ Thumbs.db
 # Misc
 *.tsbuildinfo
 .turbo/
+
+# Emails saved locally when no SMTP server is configured
+.mail-outbox/

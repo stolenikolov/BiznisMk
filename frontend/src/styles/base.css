@@ -18,6 +18,15 @@ body {
   font-feature-settings: 'cv01' on, 'ss03' on, 'zero' on;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* An email address or an IBAN is one long word; on a phone it has to be
+     allowed to break rather than push the page sideways. */
+  overflow-wrap: break-word;
+}
+
+img,
+svg,
+canvas {
+  max-width: 100%;
 }
 
 h1,

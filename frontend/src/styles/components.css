@@ -1,5 +1,6 @@
-/* Buttons — 6px radius. The acid-lime fill is the ONE chromatic action per
-   view; the white/ink pill is the nav CTA; everything else is neutral. */
+/* Buttons. Primary and ghost actions are pills: the cyan fill with dark ink is
+   the view's main action, the hairline ghost sits beside it. The quiet text
+   button keeps the control radius, since it only shows a shape on hover. */
 
 .btn-primary,
 .btn-contrast,
@@ -23,11 +24,45 @@
   background: var(--accent);
   color: var(--accent-ink);
   border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-5);
+  font-weight: var(--weight-semibold);
+}
+
+/* A leading icon ("+ Нов вработен", export) sits at text height. */
+.btn-primary svg,
+.btn-ghost svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .btn-primary:hover {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
+}
+
+/* The one irreversible action on a screen: red, and a pill like primary so it
+   reads as an action, not a warning. */
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-pill);
+  background: var(--danger);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.btn-danger:hover {
+  opacity: 0.88;
 }
 
 /* Neutral high-contrast pill — the nav sign-up CTA. */
@@ -47,6 +82,8 @@
   background: transparent;
   color: var(--text-secondary);
   border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  padding: var(--space-3) var(--space-5);
 }
 
 .btn-ghost:hover {
@@ -68,7 +105,8 @@
 .btn-primary:disabled,
 .btn-contrast:disabled,
 .btn-ghost:disabled,
-.btn-quiet:disabled {
+.btn-quiet:disabled,
+.btn-danger:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -106,48 +144,19 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-4);
   margin-bottom: var(--space-4);
 }
 
-/* Product-UI frame — the showcase surface for app screenshots. Until a real
-   screen exists, .frame-placeholder fills it with a labelled empty state. */
+/* Product-UI frame — the showcase surface for the landing page's pictures of
+   the app (styles/landing-preview.css). */
 
 .ui-frame {
   background: var(--surface-1);
   border-radius: var(--radius-card);
   box-shadow: var(--hairline) 0 0 0 1px inset;
   padding: var(--space-3);
-}
-
-.frame-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  aspect-ratio: 16 / 10;
-  border: 1px dashed var(--hairline-strong);
-  border-radius: var(--radius-control);
-  background: var(--surface-2);
-  text-align: center;
-  padding: var(--space-6);
-}
-
-/* Full-bleed hero frame: fixed height instead of a ratio, so it spans the
-   page width rather than shrinking itself to keep 16:10. */
-.frame-placeholder--hero {
-  aspect-ratio: auto;
-  height: 400px;
-}
-
-.frame-placeholder-icon {
-  color: var(--text-faint);
-}
-
-.frame-placeholder-icon svg {
-  width: 22px;
-  height: 22px;
 }
 
 /* KPI figure. Add .kpi-value--accent to the single number that matters most. */
@@ -203,6 +212,21 @@
 
 .badge-violet {
   color: var(--tag-violet);
+}
+
+.badge-amber {
+  color: var(--tag-amber);
+  background: color-mix(in srgb, var(--tag-amber) 14%, transparent);
+}
+
+/* Outlined pill — a category label (a role, a type), not a state. */
+.badge-outline {
+  border-radius: var(--radius-pill);
+  padding: var(--space-1) var(--space-3);
+  background: transparent;
+  box-shadow: var(--hairline-strong) 0 0 0 1px inset;
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 /* Forms — label above input, 6px radius, border brightens on focus. */
@@ -283,8 +307,71 @@ form button[type='submit'] {
   gap: var(--space-4);
 }
 
+/* A password field with the show/hide eye inside its right edge. */
+.password-input {
+  position: relative;
+  display: flex;
+}
+
+.password-input input {
+  flex: 1;
+  min-width: 0;
+  padding-right: var(--space-12);
+}
+
+.password-input-toggle {
+  position: absolute;
+  top: 50%;
+  right: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color var(--transition);
+}
+
+.password-input-toggle:hover {
+  color: var(--text-primary);
+}
+
+.password-input-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* An input with a unit printed inside its right edge ("МКД", "дена"). */
+.field-affix {
+  position: relative;
+  display: flex;
+}
+
+.field-affix input {
+  flex: 1;
+  min-width: 0;
+  padding-right: var(--space-12);
+}
+
+.field-affix-unit {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
 /* Yes/no choice rendered as a segmented control. The selected segment uses a
-   neutral surface step, not the accent — lime stays on the submit button. */
+   neutral surface step, not the accent — cyan stays on the submit button. */
 .field-choice {
   border: none;
   margin: 0;
@@ -455,22 +542,53 @@ form button[type='submit'] {
   padding: var(--space-10);
 }
 
+/* Round hairline button, level with the title block. */
 .modal-close {
   position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
+  top: var(--space-6);
+  right: var(--space-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   background: none;
-  border: none;
-  color: var(--text-faint);
-  font-size: 20px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  font-size: 18px;
   line-height: 1;
-  padding: var(--space-1) var(--space-2);
   cursor: pointer;
-  transition: color var(--transition);
+  transition: color var(--transition), border-color var(--transition);
 }
 
 .modal-close:hover {
   color: var(--text-primary);
+  border-color: var(--hairline-strong);
+}
+
+/* Small cyan eyebrow over a modal title: what kind of action this is. */
+.modal-eyebrow {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--accent-text);
+}
+
+/* Cancel + confirm, right-aligned under a hairline. Overrides the full-width
+   submit that single-action forms use. */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--hairline);
+}
+
+form .modal-actions button[type='submit'] {
+  width: auto;
+  margin-top: 0;
 }
 
 .modal-title {
@@ -489,6 +607,38 @@ form button[type='submit'] {
   color: var(--text-faint);
 }
 
+/* "Forgot password?" under the login form's password field. */
+.form-aside-link {
+  align-self: flex-end;
+  margin-top: calc(var(--space-2) * -1);
+  font-size: var(--text-caption);
+  color: var(--accent-text);
+}
+
+.form-aside-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* The confirmation that replaces a form once it has done its job. */
+.modal-message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-size: var(--text-body-sm);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.modal-message strong {
+  color: var(--text-primary);
+}
+
+.modal-message .btn-primary {
+  align-self: flex-start;
+  margin-top: var(--space-3);
+}
+
 .modal-footer {
   margin-top: var(--space-6);
   font-size: var(--text-caption);
@@ -496,11 +646,91 @@ form button[type='submit'] {
   text-align: center;
 }
 
-/* Neutral, not lime: the submit button is already this view's one primary
-   action, and the accent is reserved for exactly that. */
+/* Neutral, not cyan: the submit button is already this view's one primary
+   action, and a second accent right under it would compete. */
 .modal-footer a {
   color: var(--text-primary);
   font-weight: var(--weight-medium);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+/* Section header subtitle, under the page title. */
+.page-subtitle {
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+/* A row of three figure cards above a section's main content. */
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5) var(--space-6);
+}
+
+.stat-card-figure {
+  font-size: var(--text-body-lg);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--track-subheading);
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+  .stat-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* iOS Safari zooms the whole page into any field under 16px once it is
+     focused, and does not zoom back out. */
+  :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+    font-size: var(--text-body);
+  }
+
+  .modal-overlay {
+    padding: var(--space-3);
+  }
+
+  .modal-panel,
+  .modal-panel--wide {
+    padding: var(--space-6) var(--space-5);
+    /* dvh: the height left once the phone's own browser bars are drawn. */
+    max-height: calc(100dvh - var(--space-6));
+  }
+
+  .modal-close {
+    top: var(--space-4);
+    right: var(--space-4);
+    width: 40px;
+    height: 40px;
+  }
+
+  .modal-title {
+    padding-right: var(--space-10);
+  }
+
+  .modal-actions {
+    flex-wrap: wrap;
+  }
+
+  .modal-actions > * {
+    flex: 1 1 auto;
+  }
+
+  .choice-options {
+    flex-wrap: wrap;
+  }
 }

@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { Response } from 'express';
 import { randomUUID } from 'node:crypto';
 import ms from 'ms';
-import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE } from './constants.js';
+import { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, TRUSTED_DEVICE_COOKIE } from './constants.js';
 import type { AccessTokenPayload, RefreshTokenPayload } from './types/jwt-payload.type.js';
 
 @Injectable()
@@ -81,5 +81,22 @@ export class TokensService {
   clearAuthCookies(res: Response) {
     res.clearCookie(ACCESS_TOKEN_COOKIE, { ...this.cookieBaseOptions() });
     res.clearCookie(REFRESH_TOKEN_COOKIE, { ...this.cookieBaseOptions(), path: '/auth' });
+  }
+
+  /**
+   * The trusted-device token. Scoped to /auth — only signing in and the device
+   * list ever read it — and deliberately left alone by signing out: trusting
+   * a browser outlives any one session in it.
+   */
+  setTrustedDeviceCookie(res: Response, token: string, expiresAt: Date) {
+    res.cookie(TRUSTED_DEVICE_COOKIE, token, {
+      ...this.cookieBaseOptions(),
+      path: '/auth',
+      expires: expiresAt,
+    });
+  }
+
+  clearTrustedDeviceCookie(res: Response) {
+    res.clearCookie(TRUSTED_DEVICE_COOKIE, { ...this.cookieBaseOptions(), path: '/auth' });
   }
 }

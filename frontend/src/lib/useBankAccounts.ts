@@ -1,12 +1,41 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from './api.ts';
 
+// The formatting helpers moved to money.ts; re-exported so existing imports
+// keep working.
+export { formatAmount, groupIban, maskAccount } from './money.ts';
+
+export type BankAccountStatus = 'ACTIVE' | 'BLOCKED' | 'CLOSED';
+
+/** An active loan on the account. Null on the accounts that carry none. */
+export interface CreditLine {
+  creditAmount: string;
+  remainingBalance: string;
+  nextPaymentDate: string;
+  installmentAmount: string;
+  totalInstallments: number;
+  installmentsPaid: number;
+}
+
 export interface BankAccount {
   id: string;
   bankName: string;
   iban: string;
+  /** The company owner the account stands in the name of. */
+  holderName: string | null;
   currency: string;
   balance: string;
+  status: BankAccountStatus;
+  creditLine: CreditLine | null;
+}
+
+export interface AccountTransaction {
+  id: string;
+  description: string;
+  category: string;
+  direction: 'IN' | 'OUT';
+  amount: string;
+  bookedAt: string;
 }
 
 export interface CurrencyTotal {
@@ -38,30 +67,42 @@ export function useBankAccounts() {
   return { accounts, totals, isLoading, reload: load };
 }
 
-/** Shows only the last four characters, the way a bank statement would. */
-export function maskAccount(iban: string): string {
-  const trimmed = iban.trim();
-  return trimmed.length <= 4 ? trimmed : `•••• ${trimmed.slice(-4)}`;
-}
-
 /**
- * Formats a decimal string for display.
- *
- * Deliberately not Intl.NumberFormat: not every browser ships Macedonian
- * locale data, and the ones that don't silently fall back to English
- * separators — which would print 124.500,50 ден as "124,500.50". Grouping the
- * digit string directly also avoids Number(), so large amounts keep every
- * digit the database stored.
+ * One account and its own statement, for the account's page. Kept separate
+ * from the list: the detail view must not depend on the whole list having
+ * loaded, and it reads that account's transactions rather than the company's.
  */
-export function formatAmount(amount: string, locale: string): string {
-  const match = /^(-?)(\d+)(?:\.(\d*))?$/.exec(amount.trim());
-  if (!match) return amount;
+export function useBankAccount(accountId: string | undefined) {
+  const [account, setAccount] = useState<BankAccount | null>(null);
+  const [transactions, setTransactions] = useState<AccountTransaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  const [, sign = '', whole = '0', fraction = ''] = match;
-  const isMk = locale.startsWith('mk');
-  const groupSeparator = isMk ? '.' : ',';
-  const decimalSeparator = isMk ? ',' : '.';
-  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, groupSeparator);
+  const load = useCallback(async () => {
+    if (!accountId) return;
+    setIsLoading(true);
+    setNotFound(false);
 
-  return `${sign}${grouped}${decimalSeparator}${fraction.padEnd(2, '0').slice(0, 2)}`;
+    try {
+      const [details, statement] = await Promise.all([
+        api.get<{ account: BankAccount }>(`/bank-accounts/${accountId}`),
+        api.get<{ transactions: AccountTransaction[] }>(
+          `/bank-accounts/${accountId}/transactions?limit=50`,
+        ),
+      ]);
+      setAccount(details.data.account);
+      setTransactions(statement.data.transactions);
+    } catch {
+      setAccount(null);
+      setNotFound(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [accountId]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return { account, transactions, isLoading, notFound, reload: load };
 }

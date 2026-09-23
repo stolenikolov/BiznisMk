@@ -1,11 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module.js';
+import { configureApp } from './../src/app.setup.js';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+/**
+ * The app boots with its real pipeline, and every route is behind sign-in
+ * unless it says otherwise — the root included.
+ */
+describe('App (e2e)', () => {
+  let app: INestApplication;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -13,14 +17,20 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    configureApp(app);
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it('refuses an anonymous request to a route that is not public', () => {
+    return request(app.getHttpServer()).get('/').expect(401);
+  });
+
+  it('answers a public route without a session', () => {
+    // Always the same answer whether or not the address exists.
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .post('/auth/forgot-password')
+      .send({ email: 'nobody@e2e.biznismk.test' })
+      .expect(200, { success: true });
   });
 
   afterEach(async () => {

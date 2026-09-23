@@ -15,19 +15,24 @@ export function AccountsPage() {
 
   return (
     <section className="accounts-page">
+      {/* Accounts sits under Финансии in the nav, so it needs a way back up. */}
+      <Link to="/finance" className="link-arrow back-link">
+        {t('accounts.backToFinance')}
+      </Link>
+
       <div className="balance-hero">
         <span className="kpi-label label-caps">{t('dashboard.totalBalance')}</span>
         <span className="balance-hero-figure">
           {isLoading
             ? '—'
             : headline
-              ? `${formatAmount(headline.total, i18n.language)} ${headline.currency}`
-              : `0,00 MKD`}
+              ? `${formatAmount(headline.total, i18n.language, headline.currency)} ${headline.currency}`
+              : `0 MKD`}
         </span>
         {otherCurrencies.length > 0 && (
           <span className="balance-hero-other">
             {otherCurrencies
-              .map((total) => `${formatAmount(total.total, i18n.language)} ${total.currency}`)
+              .map((total) => `${formatAmount(total.total, i18n.language, total.currency)} ${total.currency}`)
               .join(' · ')}
           </span>
         )}
@@ -43,7 +48,7 @@ export function AccountsPage() {
             <span className="account-card-bank">{account.bankName}</span>
             <span className="account-card-number num">{maskAccount(account.iban)}</span>
             <span className="account-card-balance">
-              {formatAmount(account.balance, i18n.language)} {account.currency}
+              {formatAmount(account.balance, i18n.language, account.currency)} {account.currency}
             </span>
           </Link>
         ))}

@@ -1,0 +1,219 @@
+/* Notification centre — the panel behind the bell in the top nav.
+
+   Same vocabulary as the period menu it sits beside: surface-1 ground, a
+   hairline drawn as an inset ring rather than a border, 12px card radius, and
+   no drop shadow. The one chromatic element is the unread dot, which is the
+   accent doing what the accent is for — marking the thing that wants action. */
+
+.notification-menu {
+  position: relative;
+}
+
+.notification-panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  max-width: calc(100vw - var(--space-8));
+  background: var(--surface-1);
+  border-radius: var(--radius-card);
+  box-shadow: var(--hairline-strong) 0 0 0 1px inset;
+  overflow: hidden;
+}
+
+.notification-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.notification-panel-head h2 {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--track-body-sm);
+  color: var(--text-primary);
+}
+
+/* The list scrolls; the header and footer stay put. */
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.notification-row {
+  display: grid;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-bottom: 1px solid var(--hairline);
+  background: none;
+  font-family: var(--font-sans);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.notification-row:last-child {
+  border-bottom: none;
+}
+
+.notification-row:hover {
+  background: var(--surface-2);
+}
+
+.notification-row-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--track-body-sm);
+  color: var(--text-muted);
+}
+
+/* An unread row is the one with something to do, so it carries full contrast;
+   read rows recede rather than disappearing. */
+.notification-row.is-unread .notification-row-title {
+  color: var(--text-primary);
+}
+
+.notification-dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+.notification-row-message {
+  font-size: var(--text-caption);
+  letter-spacing: var(--track-caption);
+  color: var(--text-secondary);
+}
+
+.notification-row-age {
+  font-size: var(--text-label);
+  color: var(--text-faint);
+}
+
+.notification-empty {
+  padding: var(--space-8) var(--space-4);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.notification-panel-foot {
+  display: flex;
+  border-top: 1px solid var(--hairline);
+}
+
+/* The way out to the full list: a text link in the accent, across the whole foot. */
+.notification-see-all {
+  flex: 1;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  color: var(--accent-text);
+  text-align: center;
+  transition: background-color var(--transition);
+}
+
+.notification-see-all:hover {
+  background: var(--surface-2);
+}
+
+/* The notifications page — every notification, grouped by day ------------------ */
+
+.notifications-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 760px;
+}
+
+.notifications-page .page-header {
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.notification-day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.notification-day-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Wider rows than the panel's: the age moves to the right of the text. */
+.notification-day-card .notification-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+}
+
+.notification-day-card .notification-row-title,
+.notification-day-card .notification-row-message {
+  grid-column: 1;
+}
+
+.notification-day-card .notification-row-age {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.notifications-more {
+  display: flex;
+  justify-content: center;
+}
+
+/* On a phone the bell sits well in from the edge, so a panel hung from it would
+   run off the left of the screen. It spans the top bar instead, just under it. */
+@media (max-width: 720px) {
+  .topnav {
+    position: relative;
+  }
+
+  .notification-menu {
+    position: static;
+  }
+
+  .notification-panel {
+    top: 100%;
+    right: var(--space-4);
+    left: var(--space-4);
+    width: auto;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .notifications-page .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .notification-day-card .notification-row {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .notification-day-card .notification-row-age {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}

@@ -7,12 +7,12 @@
     "close": "Close",
     "yes": "Yes",
     "no": "No",
-    "sectionPending": "This section is in progress."
+    "error": "Something went wrong. Try again."
   },
   "nav": {
     "sections": "Sections",
-    "company": "Company",
-    "search": "Search",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "notifications": "Notifications",
     "notificationsUnread_one": "Notifications ({{count}} unread)",
     "notificationsUnread_other": "Notifications ({{count}} unread)",
@@ -27,6 +27,133 @@
     "register": "Register",
     "getStarted": "Get started",
     "logout": "Log out"
+  },
+  "notifications": {
+    "markAllRead": "Mark all as read",
+    "loadMore": "Show more",
+    "empty": "No notifications.",
+    "seeAll": "See all notifications",
+    "day": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "page": {
+      "subtitle": "Everything that happened in your company, newest first.",
+      "unread_one": "{{count}} unread notification",
+      "unread_other": "{{count}} unread notifications"
+    },
+    "when": {
+      "today": "today",
+      "tomorrow": "tomorrow",
+      "inDays_one": "in {{count}} day",
+      "inDays_other": "in {{count}} days"
+    },
+    "age": {
+      "now": "just now",
+      "minutes_one": "{{count}} minute ago",
+      "minutes_other": "{{count}} minutes ago",
+      "hours_one": "{{count}} hour ago",
+      "hours_other": "{{count}} hours ago",
+      "days_one": "{{count}} day ago",
+      "days_other": "{{count}} days ago"
+    },
+    "types": {
+      "ACCOUNT_OUTFLOW": {
+        "title": "Money out",
+        "message": "{{amount}} left {{account}}."
+      },
+      "ACCOUNT_INFLOW": {
+        "title": "Money in",
+        "message": "{{amount}} landed in {{account}}."
+      },
+      "INVOICE_DUE": {
+        "title": "Invoice due",
+        "message": "Invoice {{invoiceNumber}} ({{counterparty}}) is due {{when}} — {{amount}}."
+      },
+      "LOAN_INSTALLMENT_DUE": {
+        "title": "Loan instalment",
+        "message": "The instalment on {{account}} is due {{when}} — {{amount}}."
+      },
+      "EMPLOYEE_PAYDAY": {
+        "title": "Payday",
+        "message": "Salaries are paid {{when}}."
+      },
+      "SCHEDULE_PUBLISHED": {
+        "title": "New schedule",
+        "message": "Your schedule for the week of {{range}} has been published."
+      }
+    }
+  },
+  "twoFactor": {
+    "digit": "Digit {{position}} of {{total}}",
+    "codeLabel": "Code from the email",
+    "sentTo": "We sent a 6-digit code to {{email}}. It works for 10 minutes.",
+    "resent": "A new code is on its way to {{email}}.",
+    "resend": "Send a new code",
+    "resendIn": "New code in {{seconds}}s",
+    "verifying": "Checking...",
+    "sending": "Sending...",
+    "sendCode": "Send code",
+    "cancel": "Cancel",
+    "close": "Close",
+    "login": {
+      "title": "Confirm sign-in",
+      "sentTo": "Your password is right. We sent a 6-digit code to {{email}} — enter it to sign in.",
+      "remember": "Remember this device for 30 days",
+      "submit": "Confirm",
+      "back": "Back to sign in",
+      "startOver": "Sign in again"
+    },
+    "enable": {
+      "title": "Turn on two-step verification",
+      "intro": "Each time you sign in on a new device, we'll ask for a code sent to your email as well as your password. First we'll send a code to make sure the address works.",
+      "submit": "Turn on",
+      "doneTitle": "Two-step verification is on",
+      "done": "From now on, signing in on a new device also asks for a code from your email. We've emailed you a confirmation too."
+    },
+    "disable": {
+      "title": "Turn off two-step verification",
+      "intro": "This needs your password and a new code from your email. Every remembered device will be removed.",
+      "password": "Password",
+      "submit": "Turn off"
+    },
+    "errors": {
+      "invalid_one": "Wrong code. {{count}} try left.",
+      "invalid_other": "Wrong code. {{count}} tries left.",
+      "expired": "This code has expired or was already used. Ask for a new one.",
+      "tooManyAttempts": "Too many wrong codes — this code no longer works.",
+      "resendTooSoon": "Wait a moment before asking for another code.",
+      "wrongPassword": "That password isn't right.",
+      "stale": "This changed in the meantime. Refresh the page.",
+      "rateLimited": "Too many tries in a short time. Try again in a minute.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "companies": {
+    "current": "Current",
+    "open": "Open",
+    "select": {
+      "title": "Choose a business",
+      "greeting": "Hi {{name}}. Which business are you opening?",
+      "subtitle": "Your account belongs to several businesses. You can switch between them later from Settings → My businesses.",
+      "none": "Your account has no business yet. Add one to get started.",
+      "error": "That business could not be opened. Try again.",
+      "signedInAs": "Signed in as {{email}}."
+    },
+    "add": {
+      "cta": "Add business",
+      "eyebrow": "New business",
+      "title": "Add a business to your account",
+      "hint": "It is added to {{email}}, with you as its director. You sign in with the same email and password.",
+      "submit": "Add business",
+      "saving": "Adding...",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "embsTaken": "A business with this ЕМБС is already registered.",
+      "edbTaken": "A business with this ЕДБ is already registered.",
+      "generic": "The business could not be added. Check the details and try again."
+    }
   },
   "role": {
     "CEO": "CEO",
@@ -53,12 +180,365 @@
     "verifying": "Checking with the bank...",
     "verifyFailed": "The bank did not recognise this account. Check the number and try again.",
     "verifyNoFunds": "The account was verified but holds too little to track.",
+    "linkedElsewhere": "This account is already linked to another company. If it is yours, contact your bank.",
+    "bankNoSuchAccount": "The bank has no account with this number. Check it and try again.",
+    "bankAccountClosed": "The bank reports this account as closed.",
+    "bankUnavailable": "The bank is not answering right now. Try again in a moment.",
     "balanceFromBank": "The balance is taken from the bank during the check.",
     "transactions": "Transactions",
     "transactionsPending": "Transaction history arrives with the finance module.",
     "notFound": "Account not found",
     "backToList": "Back to accounts",
-    "empty": "No accounts registered yet."
+    "empty": "No accounts registered yet.",
+    "backToFinance": "← Back to Finance",
+    "detailsTitle": "Account details",
+    "holder": "Holder",
+    "holderUnknown": "not recorded",
+    "creditTitle": "Loan",
+    "creditAmount": "Approved amount",
+    "installments": "Instalments paid",
+    "noCredit": "This account carries no loan.",
+    "noTransactions": "No transactions on this account."
+  },
+  "invoices": {
+    "createCta": "New invoice",
+    "createTitle": "Issue an invoice",
+    "empty": "No invoices issued yet.",
+    "outstanding": "OUTSTANDING",
+    "issuedCount": "ISSUED",
+    "number": "Number",
+    "client": "Client",
+    "clientName": "Client name",
+    "clientAddress": "Client address",
+    "clientEdb": "Client tax number",
+    "clientEdbOptional": "Optional",
+    "issuer": "ISSUER",
+    "dates": "DATES",
+    "issueDate": "Issue date",
+    "dueDate": "Due date",
+    "status": "Status",
+    "lines": "LINES",
+    "lineDescription": "Description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "vatRate": "VAT %",
+    "vatRateDefault": "18",
+    "addLine": "Add line",
+    "removeLine": "Remove line",
+    "notes": "Notes",
+    "net": "Net",
+    "vatAt": "VAT {{rate}}%",
+    "noVat": "The company is not VAT-registered, so this invoice shows no VAT.",
+    "total": "Total",
+    "save": "Issue invoice",
+    "saving": "Issuing...",
+    "notFound": "Invoice not found",
+    "backToList": "Back to invoices",
+    "changedMeanwhile": "This invoice was just changed elsewhere. It has been reloaded — check it and try again.",
+    "statuses": {
+      "DRAFT": "Draft",
+      "SENT": "Sent",
+      "PAID": "Paid",
+      "OVERDUE": "Overdue",
+      "CANCELLED": "Cancelled"
+    },
+    "actions": {
+      "SENT": "Mark as sent",
+      "PAID": "Mark as paid",
+      "CANCELLED": "Cancel invoice"
+    },
+    "direction": "Invoice type",
+    "directions": {
+      "OUTGOING": "Issued",
+      "INCOMING": "Received"
+    },
+    "directionHint": {
+      "OUTGOING": "You issue it. Marking it paid credits your first active account.",
+      "INCOMING": "You pay it. Marking it paid debits the first account that can cover it."
+    },
+    "supplierNumber": "Invoice number (supplier's)",
+    "settledOn": "Settled through {{bank}} · {{account}}",
+    "settledOnUnknown": "Settled",
+    "print": "Print",
+    "payable": "To pay",
+    "details": "Details",
+    "detailsColumn": "Invoice details"
+  },
+  "payroll": {
+    "pay": {
+      "cta": "Pay salaries",
+      "title": "Pay salaries",
+      "pricing": "The bank is preparing the run...",
+      "total": "Total off the account (gross)",
+      "split": "Of that, {{net}} to the employees' accounts and {{statutory}} to the Public Revenue Office.",
+      "statutory": {
+        "CONTRIBUTIONS": "Social contributions (PRO)",
+        "INCOME_TAX": "Personal income tax (PRO)"
+      },
+      "accountAfter": "{{debited}} comes off {{account}} — {{after}} left.",
+      "skippedAccounts": "Accounts skipped: {{accounts}}. The bank only pays from active accounts in the payroll currency.",
+      "confirm": "Confirm payment",
+      "paying": "Paying...",
+      "cancel": "Cancel",
+      "done": "Paid {{total}} — {{net}} to {{count}} employees and {{statutory}} to the Public Revenue Office.",
+      "doneHint": "The bank takes the money off the account and reports the new balance back. The transactions show up under Finance.",
+      "paidOn": "Salaries for {{period}} were paid on {{date}}.",
+      "blocked": {
+        "NO_EMPLOYEES": "Nobody is on this period's payroll.",
+        "TAX_SETTINGS_MISSING": "Net pay cannot be worked out — the year's tax parameters are missing.",
+        "NO_ACCOUNTS": "You have no active account in the company's currency for the bank to pay from.",
+        "BANK_NOT_CONFIGURED": "The bank connection is not configured, so a run cannot be started from here."
+      },
+      "errors": {
+        "INSUFFICIENT_FUNDS": "No single account can cover these salaries in full. The bank never splits one salary across two accounts.",
+        "NO_ELIGIBLE_ACCOUNTS": "You have no active account in the payroll currency.",
+        "ACCOUNT_NOT_FOUND": "The bank does not know the account this would be paid from.",
+        "PAYROLL_ALREADY_PAID": "Salaries for this period are already paid.",
+        "PAYROLL_REQUEST_NOT_FOUND": "That run no longer exists at the bank. Try again.",
+        "PAYROLL_REQUEST_NOT_PENDING": "That run is already finished or cancelled. Reload the page.",
+        "ACCOUNT_NOT_ACTIVE": "The account was blocked or closed in the meantime. Try again.",
+        "CURRENCY_MISMATCH": "The account's currency changed in the meantime. Try again.",
+        "BANK_NOT_CONFIGURED": "The bank connection is not configured.",
+        "BANK_UNREACHABLE": "The bank did not answer. Try again later.",
+        "BANK_BAD_RESPONSE": "The bank answered with something we cannot read.",
+        "TAX_SETTINGS_MISSING": "The year's tax parameters are missing.",
+        "UNKNOWN": "The payment failed. Try again."
+      }
+    }
+  },
+  "employees": {
+    "subtitle": "Manage your team, payroll and time off",
+    "addCta": "New employee",
+    "message": {
+      "cta": "Send email",
+      "eyebrow": "Email to employees",
+      "title": "New message",
+      "to": "To",
+      "selectedCount": "{{count}} of {{total}} selected",
+      "selectAll": "Select all",
+      "selectNone": "Clear selection",
+      "subject": "Subject",
+      "subjectPlaceholder": "e.g. Team meeting on Friday",
+      "body": "Message",
+      "bodyPlaceholder": "Write your message…",
+      "privacyHint": "Each employee gets their own email and cannot see anyone else's address. Replies go to {{email}}.",
+      "send_one": "Send to {{count}} employee",
+      "send_other": "Send to {{count}} employees",
+      "sending": "Sending...",
+      "result": {
+        "sentTitle": "Message sent",
+        "notSentTitle": "Message not sent",
+        "sent_one": "The email went to {{count}} employee.",
+        "sent_other": "The email went to {{count}} employees.",
+        "outbox_one": "No mail server (SMTP) is set up: {{count}} email was saved on the server but not sent.",
+        "outbox_other": "No mail server (SMTP) is set up: {{count}} emails were saved on the server but not sent.",
+        "failed": "It did not reach: {{names}}. Check their email addresses."
+      },
+      "errors": {
+        "noRecipients": "Select at least one employee.",
+        "staleRecipients": "Someone you selected is no longer on the team. Close the message and try again.",
+        "generic": "The message could not be sent. Please try again."
+      }
+    },
+    "stats": {
+      "total": "Total employees",
+      "netPayroll": "Net payroll this month",
+      "absent": "On leave / sick"
+    },
+    "columns": {
+      "employee": "Employee",
+      "role": "Role",
+      "vacation": "Days off",
+      "salary": "Salary (gross)",
+      "contact": "Contact"
+    },
+    "vacationDays": "{{remaining}} / {{total}} days",
+    "vacationLabel": "{{remaining}} of {{total}} days off remaining",
+    "amount": "{{amount}} MKD",
+    "pay": {
+      "title": "Salary calculation",
+      "taxYear": "Tax year {{year}}",
+      "gross": "Gross salary",
+      "contributions": "Contributions ({{rate}}%)",
+      "baseAfterContributions": "Base after contributions",
+      "personalAllowance": "Personal allowance",
+      "taxableBase": "Taxable base",
+      "incomeTax": "Personal income tax ({{rate}}%)",
+      "net": "Net salary",
+      "netShort": "net {{amount}}",
+      "missing": "No tax settings have been entered for {{year}}, so the net salary cannot be calculated.",
+      "missingShort": "No tax settings for {{year}}"
+    },
+    "roles": {
+      "EMPLOYEE": "Employee",
+      "MANAGER": "Manager",
+      "CEO": "Chief executive"
+    },
+    "statuses": {
+      "ACTIVE": "Active",
+      "ON_LEAVE": "On leave",
+      "SICK_LEAVE": "On sick leave"
+    },
+    "moreInfo": "More info",
+    "empty": "You have not added any employees yet.",
+    "loadError": "Employees could not be loaded.",
+    "noCompany": "Select a company to see its team.",
+    "form": {
+      "eyebrow": "Adding an employee",
+      "title": "New employee",
+      "uploadPhoto": "Upload photo",
+      "photoSoon": "Photo uploads are coming soon — initials are shown until then.",
+      "firstName": "First name",
+      "firstNamePlaceholder": "e.g. Marko",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "e.g. Stojanovski",
+      "email": "Contact email",
+      "emailPlaceholder": "marko@firma.mk",
+      "phone": "Contact number",
+      "phonePlaceholder": "070 123 456",
+      "role": "Role in the company",
+      "status": "Status",
+      "hireDate": "Hire date",
+      "salary": "Salary (monthly, gross)",
+      "salaryUnit": "MKD",
+      "vacationDays": "Days off remaining",
+      "vacationUnit": "days",
+      "iban": "Account / IBAN (for salary payments)",
+      "ibanPlaceholder": "MK07 XXXX XXXX XXXX XXX",
+      "cancel": "Cancel",
+      "save": "Save employee",
+      "saveChanges": "Save changes",
+      "saving": "Saving...",
+      "errors": {
+        "iban": "The IBAN must be Macedonian: MK followed by 17 digits.",
+        "salary": "Enter a salary above zero with at most two decimals.",
+        "duplicateEmail": "An employee with this email already exists.",
+        "generic": "The employee could not be saved. Please try again."
+      }
+    }
+  },
+  "schedule": {
+    "subtitle": "Plan the team's shifts, week by week",
+    "weekNavigation": "Choose a week",
+    "chooseDay": "Choose a day",
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
+    "thisWeek": "← This week",
+    "editShifts": "Edit shifts",
+    "copyPrevious": "Copy from last week",
+    "copying": "Copying...",
+    "publish": "Publish schedule",
+    "publishing": "Publishing...",
+    "unlock": "Unlock to edit",
+    "stats": {
+      "hours": "Total hours this week",
+      "onShiftToday": "On shift today",
+      "onLeave": "On leave / sick",
+      "notThisWeek": "Today is not in this week"
+    },
+    "legend": {
+      "shift": "Shift",
+      "dayOff": "Day off",
+      "leave": "Leave / sick",
+      "empty": "Empty — click for a shift, a day off or leave",
+      "locked": "Published {{when}} — this week is locked",
+      "lockedShort": "This week is locked"
+    },
+    "columns": {
+      "employee": "Employee",
+      "total": "Total"
+    },
+    "hours": "{{value}} h",
+    "weekdays": {
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat",
+      "7": "Sun"
+    },
+    "months": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
+    },
+    "leave": {
+      "ON_LEAVE": "On leave",
+      "SICK_LEAVE": "Sick leave"
+    },
+    "leaveLocked": "This employee is away on this day and cannot be given a shift.",
+    "assignShift": "Assign a shift: {{name}}, {{day}}",
+    "changeShift": "Change shift: {{name}}, {{day}} — {{shift}}",
+    "noShift": "No shift",
+    "dayOff": "Day off",
+    "picker": {
+      "remove": "Remove shift",
+      "removeDayOff": "Remove day off",
+      "dayOffHint": "A free day, no shift",
+      "removeLeave": "Remove leave",
+      "leaveHint": {
+        "ON_LEAVE": "Annual leave, no shift",
+        "SICK_LEAVE": "Off sick"
+      },
+      "noTemplates": "The company has no shifts defined yet."
+    },
+    "noCompany": "Select a company to see its schedule.",
+    "noEmployees": "There is nobody to schedule yet. Add employees first.",
+    "loadError": "The schedule could not be loaded.",
+    "results": {
+      "copiedNone": "Last week has nothing to copy.",
+      "copied_one": "Copied {{count}} day from last week.",
+      "copied_other": "Copied {{count}} days from last week.",
+      "copiedWithSkipped_one": "Copied {{count}} day; {{skipped}} skipped for leave or sickness.",
+      "copiedWithSkipped_other": "Copied {{count}} days; {{skipped}} skipped for leave or sickness.",
+      "publishedNoChanges": "Schedule published. Nobody's schedule changed, so no new email was sent.",
+      "publishedEmailed_one": "Schedule published and emailed to {{count}} employee.",
+      "publishedEmailed_other": "Schedule published and emailed to {{count}} employees.",
+      "republishedEmailed_one": "Schedule published. The updated schedule was emailed to {{count}} employee with changes.",
+      "republishedEmailed_other": "Schedule published. The updated schedule was emailed to {{count}} employees with changes.",
+      "publishedOutbox_one": "Schedule published, but no mail server (SMTP) is set up: {{count}} email was saved on the server, not sent.",
+      "publishedOutbox_other": "Schedule published, but no mail server (SMTP) is set up: {{count}} emails were saved on the server, not sent.",
+      "publishedNotEmailed": "Schedule published, but the email could not be sent.",
+      "emailFailed": "It did not reach: {{names}}. Check their email addresses in Employees.",
+      "unlocked": "This week is unlocked. Publish it again when you are done."
+    },
+    "errors": {
+      "EMPLOYEE_ON_LEAVE": "This employee is on leave or sick that day.",
+      "SCHEDULE_LOCKED": "This week is published and locked. Unlock it to make changes.",
+      "SCHEDULE_ALREADY_PUBLISHED": "This week is already published.",
+      "generic": "The change could not be saved. Please try again."
+    },
+    "templates": {
+      "title": "Shifts",
+      "note": "Changes save immediately and apply to every week.",
+      "label": "Name",
+      "labelPlaceholder": "e.g. First shift",
+      "start": "Start",
+      "end": "End",
+      "duration": "Length",
+      "add": "Add shift",
+      "delete": "Delete",
+      "confirmDelete": "Confirm delete",
+      "deleted": "Shift “{{label}}” deleted.",
+      "deletedCleared_one": "Shift “{{label}}” deleted; {{count}} assigned day is now without a shift.",
+      "deletedCleared_other": "Shift “{{label}}” deleted; {{count}} assigned days are now without a shift.",
+      "empty": "The company has no shifts yet. Add the first one.",
+      "saving": "Saving...",
+      "incomplete": "Enter a name, start and end to save.",
+      "sameTimes": "The start and end cannot be the same.",
+      "overnight": "Ends the next day.",
+      "done": "Done"
+    }
   },
   "language": {
     "mk": "Macedonian",
@@ -69,14 +549,44 @@
     "light": "Switch to light theme"
   },
   "landing": {
-    "eyebrow": "FOR BUSINESSES IN NORTH MACEDONIA",
+    "eyebrow": "FOR BUSINESSES IN MACEDONIA",
     "headline": "Run your business. No chaos, no spreadsheets.",
     "subtext": "Finances, employees, schedules, and invoices — all in one place, in real time.",
     "registerCta": "Register your business",
     "loginHint": "Already have an account? Log in →",
     "preview": {
-      "dashboard": "App preview goes here",
-      "pending": "Screenshot slot — in progress"
+      "dashboard": "The BiznisMk overview: total balance across accounts, the month's income, expenses and profit, spending by category and cash flow for the last 12 months.",
+      "finance": "Finance: income, expenses, net profit and savings rate against last month, an income-versus-expenses trend and spending by category.",
+      "team": "A weekly shift rota for five employees, with morning and afternoon shifts, days off and one employee on leave.",
+      "invoices": "An invoice list with amounts to collect and to pay, and statuses: sent, overdue, paid."
+    },
+    "sample": {
+      "company": "Zlata Bakery",
+      "owner": "Ana",
+      "transactions": [
+        "Payment — Vita Market",
+        "September salaries",
+        "Shop rent",
+        "Flour — Agro Plus"
+      ],
+      "employees": [
+        "Ana Petrovska",
+        "Marko Stojanovski",
+        "Elena Nikolovska",
+        "Bojan Trajkovski",
+        "Sara Dimitrievska"
+      ],
+      "shifts": {
+        "morning": "Morning",
+        "afternoon": "Afternoon"
+      },
+      "clients": [
+        "Vita Market DOOEL",
+        "Hotel Panorama DOO",
+        "Agro Plus DOO",
+        "Café Mozaik",
+        "Vita Market DOOEL"
+      ]
     },
     "features": {
       "finance": {
@@ -93,6 +603,30 @@
       }
     }
   },
+  "footer": {
+    "tagline": "Finances, employees, schedules and invoices for Macedonian businesses — all in one place.",
+    "platform": {
+      "title": "Platform",
+      "finance": "Finances",
+      "team": "Team & schedules",
+      "invoices": "Invoices"
+    },
+    "account": {
+      "title": "Account",
+      "register": "Register a business",
+      "login": "Log in",
+      "forgot": "Forgotten password"
+    },
+    "contact": {
+      "title": "Contact",
+      "email": "kontakt@biznismk.mk",
+      "phone": "+389 70 000 000",
+      "address": "Skopje, Macedonia",
+      "hours": "Mon – Fri, 09:00 – 17:00"
+    },
+    "copyright": "© {{year}} Stole Nikolov. All rights reserved.",
+    "madeIn": "Built in Skopje, Macedonia."
+  },
   "auth": {
     "login": {
       "title": "Log in",
@@ -100,7 +634,9 @@
       "password": "Password",
       "submit": "Log in",
       "noAccount": "Don't have an account?",
-      "registerLink": "Register"
+      "registerLink": "Register",
+      "forgot": "Forgot your password?",
+      "locked": "Too many wrong passwords in a row. Sign-in is locked until {{time}}. Setting a new password unlocks it right away."
     },
     "register": {
       "title": "Register your business",
@@ -122,7 +658,38 @@
       "digitsOnly": "Digits only.",
       "submit": "Register",
       "hasAccount": "Already have an account?",
-      "loginLink": "Log in"
+      "loginLink": "Log in",
+      "emailTaken": "This email already has an account. Log in and add the new business from Settings → My businesses."
+    },
+    "password": {
+      "show": "Show password",
+      "hide": "Hide password"
+    },
+    "forgot": {
+      "title": "Forgotten password",
+      "intro": "Enter the email you sign in with and we will send you a link to set a new password.",
+      "submit": "Send link",
+      "sending": "Sending...",
+      "sentTitle": "Check your email",
+      "sent": "If there is an account for <strong>{{email}}</strong>, we have sent it a link to set a new password. The link works for 1 hour.",
+      "spamHint": "If it does not arrive within a few minutes, check your spam folder.",
+      "remembered": "Remembered it?",
+      "backToLogin": "Back to log in",
+      "error": "The link could not be sent. Please try again."
+    },
+    "reset": {
+      "title": "New password",
+      "intro": "Enter a new password of at least {{min}} characters.",
+      "password": "New password",
+      "submit": "Save password",
+      "saving": "Saving...",
+      "doneTitle": "Password changed",
+      "done": "Log in with your new password. You have been signed out everywhere else.",
+      "toLogin": "Log in",
+      "invalidTitle": "This link does not work",
+      "invalid": "The link has expired or has already been used. Ask for a new one — each link works once, for 1 hour.",
+      "requestNew": "Send a new link",
+      "error": "The password could not be saved. Please try again."
     }
   },
   "legalForm": {
@@ -144,12 +711,16 @@
     "thisMonth": "This month",
     "thisQuarter": "This quarter",
     "thisYear": "This year",
-    "exportReport": "Export report",
+    "vsPrevious": {
+      "month": "vs last month",
+      "quarter": "vs last quarter",
+      "year": "vs last year"
+    },
     "acrossAccounts_one": "Across {{count}} linked account",
     "acrossAccounts_other": "Across {{count}} linked accounts",
     "stats": {
-      "income": "Monthly income",
-      "expenses": "Monthly expenses",
+      "income": "Income",
+      "expenses": "Expenses",
       "profit": "Net profit"
     },
     "spendingByCategory": "Spending by category",
@@ -172,6 +743,7 @@
     "recentTransactions": "Recent transactions",
     "seeAll": "See all →",
     "chartHint": "Scroll to zoom, drag to pan.",
+    "chartHintTouch": "Pinch with two fingers to zoom.",
     "empty": {
       "categories": "No spending to show",
       "cashFlow": "No data for the selected period",
@@ -200,20 +772,196 @@
     "placeholder": "Financial and workforce data will appear here soon."
   },
   "settings": {
+    "subtitle": "Company details, payroll, emails, your profile and language",
+    "navLabel": "Settings sections",
+    "allSettings": "All settings",
+    "groups": {
+      "company": "Company",
+      "personal": "Personal"
+    },
+    "sections": {
+      "company": "Company details",
+      "payroll": "Payroll",
+      "email": "Emails to employees",
+      "profile": "Profile & security",
+      "businesses": "My businesses",
+      "language": "Language",
+      "account": "Close account"
+    },
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Saved.",
+    "loadError": "The settings could not be loaded.",
     "company": {
-      "title": "Company settings",
-      "intro": "Details that aren't required at signup will be filled in here.",
-      "pendingHeading": "In progress",
-      "pendingBadge": "coming soon",
-      "iban": "Bank account (IBAN)",
-      "ibanNote": "Required on invoices.",
-      "phone": "Company phone number",
-      "logo": "Company logo",
-      "website": "Website"
+      "detailsTitle": "Company details",
+      "detailsHint": "The name, legal form and address are printed on invoices.",
+      "name": "Company name",
+      "legalForm": "Legal form",
+      "address": "Registered address",
+      "phone": "Phone",
+      "phonePlaceholder": "e.g. 02 123 4567",
+      "website": "Website",
+      "websitePlaceholder": "e.g. devshop.mk",
+      "registrationTitle": "Registration",
+      "registrationHint": "The registration and tax numbers are entered at sign-up and cannot be changed, because they appear on every invoice already issued.",
+      "embs": "Registration number (ЕМБС)",
+      "edb": "Tax number (ЕДБ)"
+    },
+    "vat": {
+      "title": "VAT",
+      "hint": "Applies to new invoices. Invoices already issued keep the VAT they were issued with.",
+      "isVatPayer": "Is the company VAT-registered",
+      "defaultRate": "Default rate",
+      "defaultRateHint": "Suggested for every new invoice line; it can be changed per line.",
+      "rateOption": "{{rate}}%"
+    },
+    "payroll": {
+      "title": "Payday",
+      "hint": "The day of the month salaries are paid. A reminder arrives 3 days before, the day before and on the day.",
+      "day": "Day of the month",
+      "none": "Not set",
+      "next": "Next payday: {{date}}",
+      "noReminders": "Without a payday there are no payday reminders.",
+      "shortMonths": "When a month is shorter (e.g. the 31st in February), its last day is used."
+    },
+    "email": {
+      "title": "Emails to employees",
+      "hint": "How schedules and messages from Employees look when they reach your team.",
+      "notDelivering": "No mail server (SMTP) is set up, so emails are saved on the server instead of being sent.",
+      "senderName": "Sender name",
+      "senderNameHint": "Employees see this as the sender. Left empty, the company name is used.",
+      "replyTo": "Send replies to",
+      "replyToPlaceholder": "e.g. info@devshop.mk",
+      "replyToHint": "Left empty, a reply goes to whoever published the schedule or sent the message.",
+      "previewTitle": "Employees will see",
+      "previewFrom": "From",
+      "previewReplyTo": "Reply to",
+      "previewReplyToSender": "whoever sends or publishes"
+    },
+    "profile": {
+      "title": "My profile",
+      "hint": "Your name, the email you sign in with, and your password.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "passwordPlaceholder": "New password",
+      "passwordHint": "Leave empty to keep it. Changing the email or password sends a notice by email.",
+      "passwordTooShort": "The password needs at least {{min}} characters.",
+      "savedWithPassword": "Saved. Your password was changed and other devices were signed out."
+    },
+    "security": {
+      "eyebrow": "Security",
+      "twoFactorTitle": "Two-step verification",
+      "twoFactorHint": "When you sign in on a new device, we ask for a code sent to your email as well as your password.",
+      "turnOn": "Turn on",
+      "turnOff": "Turn off",
+      "on": "On since {{since}}",
+      "off": "Off — signing in asks for your password only.",
+      "devicesTitle": "Remembered devices",
+      "devicesHint": "Browsers where you ticked “Remember this device”. They sign in without a code for 30 days.",
+      "revokeAll": "Remove all",
+      "noDevices": "No remembered devices.",
+      "deviceName": "{{browser}} on {{os}}",
+      "unknownDevice": "Unknown device",
+      "thisDevice": "This device",
+      "lastUsed": "Last used {{when}}",
+      "revoke": "Remove",
+      "loadError": "Security settings could not be loaded.",
+      "retry": "Try again"
+    },
+    "businesses": {
+      "title": "My businesses",
+      "hint": "Every business on {{email}}. You switch between them with the same email and password, without signing in again."
+    },
+    "language": {
+      "title": "Language",
+      "hint": "The language of menus, notifications and figures. It changes right away and is remembered in this browser."
+    },
+    "account": {
+      "title": "Close account",
+      "intro": "Permanently deletes the company “{{name}}” and everything entered for it:",
+      "deletes": {
+        "employees": "the employees",
+        "invoices": "the invoices",
+        "finance": "the bank accounts and transactions",
+        "schedule": "the schedules and shifts",
+        "notifications": "the notifications",
+        "login": "your login, unless you belong to another company"
+      },
+      "final": "This cannot be undone.",
+      "confirmName": "To confirm, type the company name: {{name}}",
+      "password": "Your password",
+      "submit": "Close the account for good",
+      "closing": "Closing..."
+    },
+    "errors": {
+      "WRONG_PASSWORD": "That password is not correct.",
+      "EMAIL_TAKEN": "An account with this email already exists.",
+      "CONFIRM_NAME_MISMATCH": "The name does not match the company name.",
+      "generic": "The change could not be saved. Please try again."
     }
   },
   "notFound": {
     "title": "Page not found",
     "backHome": "Back to home"
+  },
+  "finance": {
+    "currency": "MKD",
+    "exportReport": "Export report",
+    "granularity": "Chart range",
+    "trendTitle": "Income vs expenses",
+    "categoryTitle": "Spending by category",
+    "accountsTitle": "Your accounts",
+    "creditsTitle": "Loans and debt",
+    "seeAll": "See all →",
+    "details": "Details →",
+    "income": "Income",
+    "expense": "Expense",
+    "total": "total",
+    "amount": "Amount",
+    "date": "Date",
+    "remainingDebt": "Remaining debt",
+    "nextInstallment": "Next instalment",
+    "totalDebt": "Total remaining debt: {{amount}}",
+    "paidOff": "{{percent}}% paid off",
+    "noComparison": "Nothing to compare against",
+    "deltaPercent": "{{value}}% vs previous period",
+    "loadFailed": "Could not load your finance data.",
+    "retry": "Try again",
+    "customFrom": "From",
+    "customTo": "To",
+    "customApply": "Apply",
+    "periods": {
+      "week": "This week",
+      "month": "This month",
+      "quarter": "This quarter",
+      "year": "This year",
+      "custom": "Selected period"
+    },
+    "granularities": {
+      "7d": "7D",
+      "30d": "30D",
+      "3m": "3M",
+      "1y": "Year"
+    },
+    "stats": {
+      "income": "Income",
+      "expenses": "Expenses",
+      "profit": "Net profit",
+      "savingsRate": "Savings rate"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "BLOCKED": "Blocked",
+      "CLOSED": "Closed"
+    },
+    "empty": {
+      "period": "No transactions booked in this period.",
+      "trend": "No movements in the selected range.",
+      "categories": "No spending in this period.",
+      "accounts": "No account connected yet.",
+      "credits": "No active loans."
+    }
   }
 }

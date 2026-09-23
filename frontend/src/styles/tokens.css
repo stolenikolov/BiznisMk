@@ -1,20 +1,20 @@
-/* BiznisMk design tokens — "midnight precision instrument".
-   Modelled on the Linear design system: near-black substrate, paper-white type,
-   and ONE electric acid-lime accent used as a flashlight for the single primary
-   action per view. Everything else is monochrome greyscale.
+/* BiznisMk design tokens.
+   Near-black substrate, soft-white type at three opacities, and one cyan
+   accent: primary pill buttons, links, the active tab, progress fills and
+   avatar tints. Status colours (--tag-*) label things; they never act.
 
    Rules encoded here:
-   - Acid lime (--accent) is the only chromatic UI element, and only on the one
-     primary action per view. Never decoration, never a secondary button.
-   - Type never goes bold: the weight band is 300–590. Tight tracking on
-     display sizes is non-negotiable.
-   - Elevation comes from hairline borders and surface steps, not shadow stacks.
+   - Primary actions are pills filled with --accent, dark ink on top.
+   - Inter carries the whole hierarchy (300–800); Roboto Mono only for small
+     uppercase eyebrows and technical values such as IBANs and figures.
+   - Elevation comes from 1px hairline borders and surface steps. No shadows.
    - Radius vocabulary is exactly: 2 / 4 / 6 / 12 / 9999. */
 
 :root {
-  /* Families — Inter across the whole UI, mono only for IDs and figures. */
+  /* Families — Inter across the whole UI, mono only for labels and figures.
+     Both ship Cyrillic, which the Macedonian default UI depends on. */
   --font-sans: 'Inter', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
+  --font-mono: 'Roboto Mono', ui-monospace, 'Cascadia Mono', monospace;
 
   /* One family carries the whole hierarchy, so weight does the work a second
      typeface used to. Headlines are genuinely bold now. */
@@ -72,87 +72,95 @@
   --transition: 140ms ease;
 }
 
-/* Dark — the definitive theme. Surfaces step void → carbon → obsidian → slate. */
+/* Dark — the definitive theme. Surfaces step canvas → elevated card → control
+   → track. The brief fixes canvas, card, border and the three text levels;
+   the in-between steps (--surface-2, --hairline-strong, --text-faint) are
+   interpolated from those so every existing slot stays filled. */
 :root,
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --canvas: #08090a;
-  --surface-1: #0f1011;
-  --surface-2: #161718;
-  --surface-3: #23252a;
-  --hairline: #23252a;
-  --hairline-strong: #383b3f;
+  --canvas: #0f1011;
+  --surface-1: #1a1b1c;
+  --surface-2: #222324;
+  --surface-3: #2e2e2e;
+  --hairline: #2e2e2e;
+  --hairline-strong: #3d3d3d;
 
-  --text-primary: #ffffff;
-  --text-secondary: #d0d6e0;
-  --text-muted: #8a8f98;
-  --text-faint: #62666d;
+  --text-primary: #f5f5f5;
+  --text-secondary: rgba(245, 245, 245, 0.64);
+  --text-muted: rgba(245, 245, 245, 0.42);
+  --text-faint: rgba(245, 245, 245, 0.36);
 
-  /* Acid lime: fill for the one primary action; near-black ink sits on it. */
-  --accent: #e4f222;
-  --accent-hover: #eef95e;
-  --accent-ink: #08090a;
-  /* Lime reads cleanly as text on the dark substrate. */
-  --accent-text: #e4f222;
+  /* Cyan: fills primary pills (dark ink on top), tints links and progress. */
+  --accent: #19b9d6;
+  --accent-hover: #3cc8e2;
+  --accent-ink: #0f1011;
+  --accent-text: #19b9d6;
+  /* Quiet cyan wash behind avatars and selected states. */
+  --accent-soft: rgba(25, 185, 214, 0.14);
 
-  /* Neutral high-contrast fill — the nav CTA, second only to the lime button. */
-  --contrast-fill: #ffffff;
-  --contrast-ink: #08090a;
+  /* Neutral high-contrast fill — the public nav CTA. */
+  --contrast-fill: #f5f5f5;
+  --contrast-ink: #0f1011;
 
-  /* Supporting accents: tags and badges only, never actions. */
+  /* Status tags only, never actions. Amber marks someone who is away. */
   --tag-green: #27a644;
   --tag-red: #eb5757;
   --tag-teal: #02b8cc;
   --tag-violet: #6366f1;
+  --tag-amber: #e8923a;
 
   --negative: #eb5757;
   --danger: #eb5757;
 
   --chart-1: var(--accent);
-  --chart-2: #8a8f98;
-  --chart-3: #62666d;
-  --chart-4: #383b3f;
-  --chart-grid: #23252a;
+  --chart-2: #858585;
+  --chart-3: #5e5e5e;
+  --chart-4: #3d3d3d;
+  --chart-grid: #2e2e2e;
 }
 
-/* Light — secondary. Linear's system is dark-only, so this keeps the same
-   structure and lime fill while swapping in a readable accent for text. */
+/* Light — warm paper. Text opacities run a step stronger than in the dark
+   theme: at the dark values, muted labels fall under 3:1 on paper. */
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --canvas: #f7f7f8;
+  --canvas: #faf9f7;
   --surface-1: #ffffff;
-  --surface-2: #f1f1f3;
-  --surface-3: #e4e4e7;
-  --hairline: #e4e4e7;
-  --hairline-strong: #d0d1d5;
+  --surface-2: #f3f1ee;
+  --surface-3: #e6e2dd;
+  --hairline: #e6e2dd;
+  --hairline-strong: #d4cec7;
 
-  --text-primary: #08090a;
-  --text-secondary: #3f3f46;
-  --text-muted: #71717a;
-  --text-faint: #9a9aa2;
+  --text-primary: #14110f;
+  --text-secondary: rgba(20, 17, 15, 0.72);
+  --text-muted: rgba(20, 17, 15, 0.6);
+  --text-faint: rgba(20, 17, 15, 0.44);
 
-  --accent: #e4f222;
-  --accent-hover: #d6e400;
-  --accent-ink: #08090a;
-  /* Lime is unreadable as text on paper — drop to a dark olive instead. */
-  --accent-text: #5c6600;
+  --accent: #0f9cb8;
+  --accent-hover: #0d8aa3;
+  --accent-ink: #14110f;
+  /* #0f9cb8 is ~3:1 on paper — too faint for small link text and for
+     initials on the --accent-soft wash. This clears 4.5:1 on both. */
+  --accent-text: #0a6e82;
+  --accent-soft: rgba(15, 156, 184, 0.12);
 
-  --contrast-fill: #08090a;
+  --contrast-fill: #14110f;
   --contrast-ink: #ffffff;
 
   --tag-green: #1f8536;
   --tag-red: #c8433f;
   --tag-teal: #0a8fa0;
   --tag-violet: #4f52d4;
+  --tag-amber: #8f4f08;
 
   --negative: #c8433f;
   --danger: #c8433f;
 
-  --chart-1: #5c6600;
-  --chart-2: #71717a;
-  --chart-3: #9a9aa2;
-  --chart-4: #d0d1d5;
-  --chart-grid: #e4e4e7;
+  --chart-1: var(--accent);
+  --chart-2: #8f8a85;
+  --chart-3: #b3aea8;
+  --chart-4: #d4cec7;
+  --chart-grid: #e6e2dd;
 }

@@ -1,9 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { randomInt } from 'node:crypto';
 import { BankIntegrationProvider } from './bank-integration.provider.js';
-import { TransactionCategory, TransactionDirection } from '../generated/prisma/enums.js';
+import { BankApiClient, bankBadResponse, text } from './bank-api.client.js';
+import { BankAccountStatus, TransactionCategory, TransactionDirection } from '../generated/prisma/enums.js';
 import type {
+  AccountLinkRequest,
+  AccountLinkResult,
   BankAccountRef,
+  BankCreditLine,
   BankStatement,
   BankStatementEntry,
   BankVerificationResult,
@@ -27,18 +31,27 @@ const INCOME_CLIENTS = [
 ] as const;
 
 /**
- * PLACEHOLDER — this talks to no bank. Every figure below is invented locally
- * and is not connected to any real institution, account or person.
+ * PLACEHOLDER — the checks and statements below talk to no bank. Every figure
+ * they return is invented locally and is not connected to any real
+ * institution, account or person.
  *
  * It exists so the app can be built and demoed end to end: connecting an
  * account returns a balance and a plausible statement, which the app then
  * stores as ordinary rows. Everything downstream reads those rows, so
  * replacing this with a real open-banking integration changes nothing but
  * this file and the binding in BankIntegrationModule.
+ *
+ * Linking is the exception, and goes to the Mock Bank API: whose account an
+ * IBAN is decides whose salaries it may pay, so it must be the bank's answer
+ * rather than one made up here.
  */
 @Injectable()
 export class MockBankIntegrationProvider extends BankIntegrationProvider {
   private readonly logger = new Logger(MockBankIntegrationProvider.name);
+
+  constructor(private readonly client: BankApiClient) {
+    super();
+  }
 
   /** Roughly one in ten checks fails, so the unhappy path is reachable. */
   private static readonly FAILURE_RATE = 0.1;
@@ -47,6 +60,10 @@ export class MockBankIntegrationProvider extends BankIntegrationProvider {
   /** Stand-in for network latency, so the UI's checking state is visible. */
   private static readonly LATENCY_MS = 900;
   private static readonly MONTHS_OF_HISTORY = 9;
+  /** Share of connected accounts the bank reports as blocked. */
+  private static readonly BLOCKED_RATE = 0.12;
+  /** Share of connected accounts carrying an active loan. */
+  private static readonly CREDIT_LINE_RATE = 0.35;
 
   async checkAccount(account: BankAccountRef): Promise<BankVerificationResult> {
     this.logger.debug(`Mock verification for ${account.bankName} (${account.iban})`);
@@ -64,6 +81,36 @@ export class MockBankIntegrationProvider extends BankIntegrationProvider {
       mockBalance: toDecimalString(balanceMinor),
       provider: 'mock',
     };
+  }
+
+  /**
+   * Claims the account for the company at the bank. The first company to claim
+   * a free account keeps it; asking again for one's own account is harmless.
+   */
+  async linkAccount(request: AccountLinkRequest): Promise<AccountLinkResult> {
+    const { ok, body } = await this.client.call('POST', '/accounts/verify', {
+      iban: request.iban,
+      companyId: request.companyId,
+      holderName: request.holderName,
+    });
+
+    const errorCode = text(body, 'errorCode');
+    if (errorCode === 'ACCOUNT_NOT_FOUND' || errorCode === 'INVALID_IBAN_FORMAT') return { outcome: 'not_found' };
+    if (errorCode === 'ACCOUNT_ALREADY_LINKED') return { outcome: 'linked_elsewhere' };
+    if (errorCode === 'ACCOUNT_CLOSED') return { outcome: 'closed' };
+
+    const linkStatus = text(body, 'linkStatus');
+    if (
+      ok &&
+      body['exists'] === true &&
+      (linkStatus === 'CLAIMED' || linkStatus === 'ALREADY_YOURS') &&
+      text(body, 'companyId') === request.companyId
+    ) {
+      return { outcome: 'linked' };
+    }
+
+    this.logger.error(`Unexpected answer linking ${request.iban}: ${errorCode ?? linkStatus ?? 'no status'}`);
+    throw bankBadResponse();
   }
 
   /**
@@ -115,8 +162,44 @@ export class MockBankIntegrationProvider extends BankIntegrationProvider {
     return {
       // A mock account should never read as overdrawn.
       balance: toDecimalString(Math.max(balanceMinor, 0)),
+      status: this.inventStatus(),
+      creditLine: this.inventCreditLine(),
       entries,
       provider: 'mock',
+    };
+  }
+
+  /** Mostly ACTIVE, so the blocked-account treatment is still reachable. */
+  private inventStatus(): BankAccountStatus {
+    return randomInt(0, 100) < MockBankIntegrationProvider.BLOCKED_RATE * 100
+      ? BankAccountStatus.BLOCKED
+      : BankAccountStatus.ACTIVE;
+  }
+
+  /**
+   * Roughly one account in three carries a loan, and it is part-way through
+   * repayment — the remaining balance follows from the instalments left, so the
+   * figure and the progress bar agree.
+   */
+  private inventCreditLine(): BankCreditLine | null {
+    if (randomInt(0, 100) >= MockBankIntegrationProvider.CREDIT_LINE_RATE * 100) return null;
+
+    const totalInstallments = [12, 24, 36, 48, 60][randomInt(0, 5)]!;
+    const installmentsPaid = randomInt(1, totalInstallments);
+    const creditAmountMinor = randomInt(300_000_00, 3_000_000_00);
+    const installmentMinor = Math.round(creditAmountMinor / totalInstallments);
+
+    const nextPaymentDate = new Date();
+    nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1, randomInt(1, 28));
+    nextPaymentDate.setHours(12, 0, 0, 0);
+
+    return {
+      creditAmount: toDecimalString(creditAmountMinor),
+      remainingBalance: toDecimalString(installmentMinor * (totalInstallments - installmentsPaid)),
+      nextPaymentDate,
+      installmentAmount: toDecimalString(installmentMinor),
+      totalInstallments,
+      installmentsPaid,
     };
   }
 

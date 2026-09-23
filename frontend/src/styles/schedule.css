@@ -1,0 +1,744 @@
+/* Schedule — the weekly grid, the shift picker, and the shift editor. Layout
+   only: every colour, radius and border comes from tokens.css. */
+
+.schedule {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.schedule .page-header {
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-1);
+}
+
+.schedule .page-header .page-title {
+  margin-bottom: var(--space-1);
+}
+
+.schedule-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Week navigation ------------------------------------------------------------- */
+
+.week-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--hairline) 0 0 0 1px inset;
+}
+
+.week-nav-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition), background-color var(--transition);
+}
+
+.week-nav-step:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+.week-nav-step svg {
+  width: 15px;
+  height: 15px;
+}
+
+.week-nav-label {
+  min-width: 13.5rem;
+  padding: 0 var(--space-2);
+  text-align: center;
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.week-nav-today {
+  align-self: flex-end;
+  margin-top: calc(var(--space-4) * -1);
+  font-size: var(--text-label);
+}
+
+.schedule-message {
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+/* Legend ---------------------------------------------------------------------- */
+
+.schedule-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  font-size: var(--text-label);
+  color: var(--text-muted);
+}
+
+.schedule-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.schedule-legend-item svg {
+  width: 12px;
+  height: 12px;
+}
+
+.schedule-legend-locked {
+  color: var(--text-secondary);
+}
+
+.legend-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 12px;
+  border-radius: var(--radius-pill);
+}
+
+.legend-swatch--shift {
+  background: var(--accent-soft);
+  box-shadow: color-mix(in srgb, var(--accent) 40%, transparent) 0 0 0 1px inset;
+}
+
+.legend-swatch--day-off {
+  background: var(--surface-2);
+  box-shadow: var(--hairline-strong) 0 0 0 1px inset;
+}
+
+.legend-swatch--leave {
+  background: color-mix(in srgb, var(--tag-amber) 14%, transparent);
+}
+
+.legend-swatch--empty {
+  border: 1px dashed var(--hairline-strong);
+  color: var(--text-faint);
+}
+
+.legend-swatch--empty svg {
+  width: 8px;
+  height: 8px;
+}
+
+/* The grid ---------------------------------------------------------------------
+
+   One bordered card. Each row is its own CSS grid on the same column template,
+   so every row keeps its hairline divider and the columns still line up. */
+
+.schedule-card {
+  --schedule-columns: minmax(240px, 1.6fr) repeat(7, minmax(112px, 1fr)) minmax(72px, 0.55fr);
+  padding: 0;
+  overflow: hidden;
+}
+
+.schedule-scroll {
+  overflow-x: auto;
+}
+
+.schedule-grid {
+  min-width: 1120px;
+}
+
+.schedule-row {
+  display: grid;
+  grid-template-columns: var(--schedule-columns);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.schedule-row:last-child {
+  border-bottom: none;
+}
+
+.schedule-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: var(--space-3);
+}
+
+/* The name column ends in a hairline with room before it, so a long name
+   never runs into Monday's shift. */
+.schedule-cell--person {
+  padding-left: var(--space-5);
+  padding-right: var(--space-6);
+  border-right: 1px solid var(--hairline);
+}
+
+.schedule-cell--person + .schedule-cell {
+  padding-left: var(--space-4);
+}
+
+.schedule-cell--person .employee-person,
+.schedule-cell--person .employee-name {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.schedule-cell--person .employee-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.schedule-cell--total {
+  justify-content: flex-end;
+  padding-right: var(--space-5);
+}
+
+.schedule-row--head .schedule-cell {
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.schedule-day {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+}
+
+.schedule-day-date {
+  color: var(--text-secondary);
+}
+
+/* Today: an accent rule on its header and a faint wash down its column. */
+.schedule-day.is-today {
+  box-shadow: var(--accent) 0 2px 0 0 inset;
+}
+
+.schedule-day.is-today .label-caps,
+.schedule-day.is-today .schedule-day-date {
+  color: var(--accent-text);
+}
+
+.schedule-slot.is-today {
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+
+.schedule-slot {
+  min-height: 64px;
+}
+
+.schedule-role {
+  font-size: var(--text-label);
+  color: var(--text-muted);
+}
+
+.schedule-total {
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+/* Cell contents ------------------------------------------------------------------ */
+
+.shift-pill,
+.shift-add,
+.leave-tag,
+.leave-pill,
+.day-off-pill {
+  width: 100%;
+  min-height: 40px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+}
+
+/* A planned day off: neutral, so it reads as "not working" next to the
+   accent shifts, yet distinct from an empty, unplanned day. */
+.day-off-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-2);
+  border: none;
+  background: var(--surface-2);
+  box-shadow: var(--hairline-strong) 0 0 0 1px inset;
+  color: var(--text-secondary);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: box-shadow var(--transition), color var(--transition);
+}
+
+.day-off-pill:hover {
+  box-shadow: var(--text-muted) 0 0 0 1px inset;
+  color: var(--text-primary);
+}
+
+.day-off-pill.is-static,
+.day-off-pill.is-static:hover {
+  box-shadow: var(--hairline-strong) 0 0 0 1px inset;
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.shift-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: var(--accent-soft);
+  box-shadow: color-mix(in srgb, var(--accent) 40%, transparent) 0 0 0 1px inset;
+  color: var(--text-primary);
+  text-align: center;
+  cursor: pointer;
+  transition: box-shadow var(--transition), background-color var(--transition);
+}
+
+.shift-pill:hover {
+  box-shadow: var(--accent) 0 0 0 1px inset;
+}
+
+.shift-pill.is-static {
+  cursor: default;
+}
+
+.shift-pill.is-static:hover {
+  box-shadow: color-mix(in srgb, var(--accent) 40%, transparent) 0 0 0 1px inset;
+}
+
+.shift-pill-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+}
+
+.shift-pill-time {
+  font-size: 0.6875rem;
+  color: var(--accent-text);
+}
+
+.shift-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px dashed var(--hairline-strong);
+  background: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: border-color var(--transition), color var(--transition), opacity var(--transition);
+}
+
+.shift-add svg {
+  width: 13px;
+  height: 13px;
+}
+
+.schedule-row:hover .shift-add,
+.shift-add:focus-visible {
+  opacity: 1;
+}
+
+.shift-add:hover {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.leave-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  background: color-mix(in srgb, var(--tag-amber) 14%, transparent);
+  color: var(--tag-amber);
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  cursor: not-allowed;
+}
+
+.leave-tag svg {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+}
+
+/* Leave planned for this one day: the same amber as the status tag, without
+   its lock, because the manager can change it like any other day. */
+.leave-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-2);
+  border: none;
+  background: color-mix(in srgb, var(--tag-amber) 14%, transparent);
+  box-shadow: color-mix(in srgb, var(--tag-amber) 35%, transparent) 0 0 0 1px inset;
+  color: var(--tag-amber);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: box-shadow var(--transition);
+}
+
+.leave-pill:hover {
+  box-shadow: var(--tag-amber) 0 0 0 1px inset;
+}
+
+.leave-pill.is-static,
+.leave-pill.is-static:hover {
+  box-shadow: color-mix(in srgb, var(--tag-amber) 35%, transparent) 0 0 0 1px inset;
+  cursor: default;
+}
+
+.shift-none {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+}
+
+/* Shift picker ---------------------------------------------------------------------- */
+
+.shift-picker {
+  position: fixed;
+  z-index: 90;
+  width: 250px;
+  max-height: min(420px, calc(100vh - 32px));
+  overflow-y: auto;
+  padding: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--surface-1);
+  box-shadow: var(--hairline-strong) 0 0 0 1px inset;
+}
+
+.shift-picker-heading {
+  padding: var(--space-2) var(--space-2) var(--space-3);
+  font-size: var(--text-label);
+  color: var(--text-muted);
+}
+
+.shift-picker-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shift-picker-option {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+  padding: var(--space-2);
+  border: none;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--transition);
+}
+
+.shift-picker-option:hover,
+.shift-picker-option:focus-visible {
+  background: var(--surface-2);
+}
+
+.shift-picker-option.is-current {
+  background: var(--accent-soft);
+}
+
+.shift-picker-option svg {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  width: 14px;
+  height: 14px;
+  color: var(--accent-text);
+}
+
+.shift-picker-label {
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+}
+
+.shift-picker-time {
+  grid-column: 1;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.shift-picker-divider {
+  height: 1px;
+  margin: var(--space-1) var(--space-2);
+  background: var(--hairline);
+}
+
+.shift-picker-option--day-off .shift-picker-label {
+  color: var(--text-secondary);
+}
+
+.shift-picker-option--leave .shift-picker-label {
+  color: var(--tag-amber);
+}
+
+.shift-picker-remove {
+  width: 100%;
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  border: none;
+  border-top: 1px solid var(--hairline);
+  border-radius: 0 0 var(--radius-control) var(--radius-control);
+  background: none;
+  color: var(--danger);
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  text-align: left;
+  cursor: pointer;
+}
+
+.shift-picker-remove:hover {
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+}
+
+.shift-picker-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: 0 var(--space-2) var(--space-2);
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+.shift-picker-error {
+  padding: var(--space-2);
+}
+
+/* Shift editor ------------------------------------------------------------------------ */
+
+.shift-templates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.shift-template-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7rem 7rem 3.5rem auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.shift-template-row--head {
+  padding-bottom: var(--space-1);
+}
+
+.shift-template-row--head .label-caps {
+  font-size: 0.6875rem;
+}
+
+.shift-template-input {
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--text-primary) 2%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+}
+
+.shift-template-input:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+}
+
+.shift-template-duration {
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.shift-template-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-faint);
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.shift-template-delete svg {
+  width: 15px;
+  height: 15px;
+}
+
+.shift-template-delete:hover,
+.shift-template-delete.is-confirming {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
+}
+
+.shift-template-status {
+  min-height: 1.1em;
+  padding: 0 0 var(--space-1) var(--space-1);
+  font-size: var(--text-label);
+  color: var(--text-faint);
+}
+
+.shift-template-status.is-error {
+  color: var(--danger);
+}
+
+.shift-templates-empty {
+  padding: var(--space-3) 0;
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.shift-templates-add {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+}
+
+.shift-templates-notice {
+  margin-top: var(--space-4);
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 720px) {
+  .schedule .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .schedule-actions {
+    justify-content: flex-start;
+  }
+
+  .week-nav-today {
+    align-self: flex-start;
+    margin-top: 0;
+  }
+
+  .shift-template-row {
+    grid-template-columns: minmax(0, 1fr) 1fr auto;
+  }
+
+  .shift-template-row > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .shift-template-row--head,
+  .shift-template-duration {
+    display: none;
+  }
+
+  /* Seven days do not fit a phone, and a week that scrolls sideways hides most
+     of itself. One day at a time instead: the picker above chooses it, and the
+     board shows each person, that day's shift, and their week's hours. */
+  .schedule-day-picker {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--space-1);
+  }
+
+  .schedule-scroll {
+    overflow-x: visible;
+  }
+
+  .schedule-grid {
+    min-width: 0;
+  }
+
+  /* Every row is its own grid, so no column may size itself to its content:
+     "ВКУПНО" is wider than "40 ч", and an auto column would shift the rules. */
+  .schedule-card {
+    --schedule-columns: minmax(0, 1fr) minmax(112px, 1fr) 72px;
+  }
+
+  .schedule-day:not(.is-focused),
+  .schedule-slot:not(.is-focused) {
+    display: none;
+  }
+
+  .schedule-cell--person {
+    padding-left: var(--space-4);
+    padding-right: var(--space-3);
+  }
+
+  .schedule-cell--person .employee-name {
+    white-space: normal;
+  }
+}
+
+/* Only on phones (above). */
+@media (min-width: 721px) {
+  .schedule-day-picker {
+    display: none;
+  }
+}
+
+.schedule-day-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: var(--space-2) 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: none;
+  font-family: var(--font-sans);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition);
+}
+
+.schedule-day-pick .num {
+  font-size: var(--text-body-sm);
+  color: var(--text-primary);
+}
+
+.schedule-day-pick.is-today,
+.schedule-day-pick.is-today .num {
+  color: var(--accent-text);
+}
+
+.schedule-day-pick[aria-pressed='true'] {
+  border-color: var(--text-secondary);
+  background: var(--surface-3);
+}

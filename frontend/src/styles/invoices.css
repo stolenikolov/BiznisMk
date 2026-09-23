@@ -1,0 +1,419 @@
+/* Invoices — list, document view, and the line editor in the create modal.
+   Everything here is built from the tokens in tokens.css; no new colours,
+   radii, or shadows are introduced. */
+
+/* A title on the left, the view's single primary action on the right. */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.page-header .page-title {
+  margin-bottom: var(--space-2);
+}
+
+.invoice-summary-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  padding: var(--space-6) var(--card-padding);
+  margin-bottom: var(--space-6);
+  border-radius: var(--radius-card);
+  background: var(--surface-1);
+  box-shadow: 0 0 0 1px var(--hairline) inset;
+}
+
+.kpi-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-block .kpi-value {
+  font-size: var(--text-title);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.invoice-number-link {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.invoice-number-link:hover {
+  color: var(--accent-text);
+}
+
+/* The number column reads as an identifier, so it keeps mono alignment even
+   though it is the row's first cell rather than a figure. */
+.invoice-table td:first-child {
+  white-space: nowrap;
+}
+
+.invoice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+/* Document header: issuer, client, dates side by side. */
+.invoice-parties {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-8);
+  margin-bottom: var(--space-6);
+}
+
+.invoice-parties p {
+  margin: 0 0 var(--space-1);
+  color: var(--text-secondary);
+  font-size: var(--text-body-sm);
+}
+
+.invoice-party-name {
+  color: var(--text-primary) !important;
+  font-weight: var(--weight-semibold);
+  margin-top: var(--space-3) !important;
+}
+
+.invoice-vat-note {
+  margin-top: var(--space-3) !important;
+  color: var(--text-muted) !important;
+}
+
+/* Totals block — right-aligned ladder ending in the payable figure. */
+.invoice-totals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  margin-left: auto;
+  width: min(320px, 100%);
+}
+
+.invoice-totals-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-6);
+  font-size: var(--text-body-sm);
+  color: var(--text-muted);
+}
+
+.invoice-totals-row .num {
+  color: var(--text-secondary);
+}
+
+.invoice-totals-row--total {
+  margin-top: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--hairline);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.invoice-totals-row--total .num {
+  color: var(--text-primary);
+}
+
+/* Line editor inside the create modal. */
+.invoice-line-row {
+  display: grid;
+  grid-template-columns: 1fr 88px 120px 88px auto;
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.invoice-line-row label {
+  margin: 0;
+}
+
+.invoice-line-remove {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: var(--text-body-lg);
+  line-height: 1;
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.invoice-line-remove:hover:not(:disabled) {
+  color: var(--danger);
+}
+
+.invoice-line-remove:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 860px) {
+  .invoice-parties {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-line-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .invoice-line-description {
+    grid-column: 1 / -1;
+  }
+
+  .invoice-summary-strip {
+    gap: var(--space-6);
+  }
+}
+
+/* Where a paid invoice's money actually moved. */
+.invoice-settled {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+/* Printing ----------------------------------------------------------------
+
+   An invoice is a document before it is a screen: printing one must produce
+   the paper version, not a screenshot of the app. Everything that belongs to
+   the application — navigation, buttons, status pills — is dropped, and the
+   document itself is laid out in black on white so it survives a monochrome
+   printer and a "Save as PDF". */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+
+  .topnav,
+  .invoice-actions,
+  .link-arrow,
+  .back-link,
+  .badge {
+    display: none !important;
+  }
+
+  html,
+  body,
+  .shell,
+  .shell-content {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0;
+    padding: 0;
+    display: block;
+  }
+
+  /* Cards are a screen device: on paper they become plain blocks with a rule
+     where a border actually helps read the figures. */
+  .card {
+    background: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-bottom: 8mm;
+    break-inside: avoid;
+  }
+
+  .invoice-parties {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10mm;
+  }
+
+  .page-title {
+    font-size: 20pt;
+  }
+
+  .label-caps,
+  .invoice-vat-note,
+  .invoice-settled {
+    color: #444444 !important;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table th,
+  .table td {
+    border-bottom: 0.3mm solid #999999;
+    color: #000000 !important;
+    padding: 2mm 1mm;
+  }
+
+  .table thead {
+    display: table-header-group;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+  /* Totals must never be orphaned onto a page of their own. */
+  .invoice-totals {
+    break-inside: avoid;
+  }
+
+  a {
+    text-decoration: none;
+    color: #000000 !important;
+  }
+}
+
+/* Invoice table columns ----------------------------------------------------
+
+   Dates are read left to right like words, not compared like quantities, so
+   they align left — header and cell together. Only the money column is right
+   aligned, which is what makes the amounts scan down the page. */
+
+.invoice-table .cell-date {
+  text-align: left;
+}
+
+.invoice-table th,
+.invoice-table td {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* The client is the one column allowed to give way when space is short. */
+.invoice-table td:nth-child(3) {
+  white-space: normal;
+  min-width: 10ch;
+}
+
+.invoice-table .cell-actions {
+  text-align: right;
+  width: 1%;
+}
+
+/* A row-sized button: reads as an action without competing with the page's
+   primary one. */
+.btn-row {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-label);
+  white-space: nowrap;
+}
+
+.invoice-table tbody tr:hover .btn-row {
+  border-color: var(--hairline-strong);
+  color: var(--text-primary);
+}
+
+/* Narrow screens: the table scrolls sideways rather than crushing columns. */
+@media (max-width: 900px) {
+  .invoice-table-scroll {
+    overflow-x: auto;
+  }
+
+  .invoice-table {
+    min-width: 760px;
+  }
+}
+
+/* Phones: the list becomes one card per invoice — number and total on top,
+   the client under them, then its badges and due date. The issue date and
+   the details button go; the number is already the link. */
+@media (max-width: 640px) {
+  .invoice-summary-strip {
+    gap: var(--space-5) var(--space-8);
+    padding: var(--space-5);
+  }
+
+  .invoice-actions {
+    width: 100%;
+  }
+
+  .invoice-actions > * {
+    flex: 1 1 auto;
+  }
+
+  .invoice-table--list {
+    min-width: 0;
+  }
+
+  .invoice-table--list thead {
+    display: none;
+  }
+
+  .invoice-table--list,
+  .invoice-table--list tbody {
+    display: block;
+  }
+
+  .invoice-table--list tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .invoice-table--list tr:first-child {
+    padding-top: 0;
+  }
+
+  .invoice-table--list tr:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .invoice-table--list td {
+    display: block;
+    padding: 0;
+    border: none;
+    white-space: normal;
+  }
+
+  .invoice-table--list tbody tr:hover td {
+    background: none;
+  }
+
+  .invoice-table--list .cell-total {
+    order: 1;
+    margin-left: auto;
+  }
+
+  .invoice-table--list .cell-number {
+    order: 0;
+  }
+
+  .invoice-table--list .cell-client {
+    order: 2;
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  .invoice-table--list .cell-direction {
+    order: 3;
+  }
+
+  .invoice-table--list .cell-status {
+    order: 4;
+  }
+
+  .invoice-table--list .cell-due {
+    order: 5;
+    margin-left: auto;
+    font-size: var(--text-caption);
+    color: var(--text-muted);
+  }
+
+  .invoice-table--list .cell-due::before {
+    content: attr(data-label) ' ';
+    font-family: var(--font-sans);
+  }
+
+  .invoice-table--list .cell-issue,
+  .invoice-table--list .cell-actions {
+    display: none;
+  }
+}

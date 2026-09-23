@@ -2,5 +2,14 @@
 @import './styles/base.css';
 @import './styles/components.css';
 @import './styles/layout.css';
+@import './styles/notifications.css';
 @import './styles/overview.css';
+@import './styles/invoices.css';
+@import './styles/finance.css';
+@import './styles/employees.css';
+@import './styles/schedule.css';
+@import './styles/settings.css';
+@import './styles/companies.css';
+@import './styles/two-factor.css';
 @import './styles/landing.css';
+@import './styles/landing-preview.css';

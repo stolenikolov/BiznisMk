@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth.ts';
 import { formatAmount, useBankAccounts } from '../lib/useBankAccounts.ts';
-import { useOverview } from '../lib/useOverview.ts';
+import { OVERVIEW_PERIODS, useOverview, type OverviewPeriod } from '../lib/useOverview.ts';
 import { FinanceIcon, InvoiceIcon } from '../components/icons.tsx';
 
 // ECharts is large and only this card needs it, so it loads on demand rather
@@ -15,19 +15,26 @@ const CashFlowChart = lazy(() =>
 const RANGES = ['1y', '6m', '1m'] as const;
 const RANGE_MONTHS: Record<(typeof RANGES)[number], number> = { '1y': 12, '6m': 6, '1m': 1 };
 
+const PERIOD_LABELS: Record<OverviewPeriod, string> = {
+  month: 'overview.thisMonth',
+  quarter: 'overview.thisQuarter',
+  year: 'overview.thisYear',
+};
+
 function greetingKey(hour = new Date().getHours()): 'morning' | 'afternoon' | 'evening' {
   if (hour < 12) return 'morning';
   if (hour < 18) return 'afternoon';
   return 'evening';
 }
 
-/** Rendered only when there is something to compare against. */
-function Delta({ percent, invert = false }: { percent: number | null; invert?: boolean }) {
+/** Rendered only when there is something to compare against; `context` says against what. */
+function Delta({ percent, invert = false, context }: { percent: number | null; invert?: boolean; context: string }) {
   if (percent === null) return null;
   const good = invert ? percent <= 0 : percent >= 0;
   return (
     <span className={`delta${good ? '' : ' is-negative'}`}>
-      {percent >= 0 ? '▲' : '▼'} {Math.abs(percent).toFixed(1)}%
+      {percent >= 0 ? '▲' : '▼'} {Math.abs(percent).toFixed(1)}%{' '}
+      <span className="delta-context">{context}</span>
     </span>
   );
 }
@@ -46,16 +53,17 @@ export function OverviewPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { totals, accounts } = useBankAccounts();
-  const { overview, isLoading } = useOverview();
+  const [period, setPeriod] = useState<OverviewPeriod>('month');
+  const { overview, isLoading } = useOverview(period);
   const [range, setRange] = useState<(typeof RANGES)[number]>('1y');
 
   const [headline] = totals;
   const cashFlow = overview.cashFlow.slice(-RANGE_MONTHS[range]);
 
   const stats = [
-    { key: 'income', amount: overview.monthly.income, delta: overview.deltas.income, invert: false },
-    { key: 'expenses', amount: overview.monthly.expenses, delta: overview.deltas.expenses, invert: true },
-    { key: 'profit', amount: overview.monthly.profit, delta: overview.deltas.profit, invert: false },
+    { key: 'income', amount: overview.summary.income, delta: overview.deltas.income, invert: false },
+    { key: 'expenses', amount: overview.summary.expenses, delta: overview.deltas.expenses, invert: true },
+    { key: 'profit', amount: overview.summary.profit, delta: overview.deltas.profit, invert: false },
   ] as const;
 
   return (
@@ -70,14 +78,18 @@ export function OverviewPage() {
           </p>
         </div>
         <div className="overview-head-actions">
-          <select className="range-select" defaultValue="month" aria-label={t('overview.range')}>
-            <option value="month">{t('overview.thisMonth')}</option>
-            <option value="quarter">{t('overview.thisQuarter')}</option>
-            <option value="year">{t('overview.thisYear')}</option>
+          <select
+            className="range-select"
+            value={period}
+            onChange={(event) => setPeriod(event.target.value as OverviewPeriod)}
+            aria-label={t('overview.range')}
+          >
+            {OVERVIEW_PERIODS.map((option) => (
+              <option key={option} value={option}>
+                {t(PERIOD_LABELS[option])}
+              </option>
+            ))}
           </select>
-          <button type="button" className="btn-ghost">
-            {t('overview.exportReport')}
-          </button>
         </div>
       </header>
 
@@ -88,7 +100,7 @@ export function OverviewPage() {
             <span className="balance-hero-figure">
               {headline
                 ? `${formatAmount(headline.total, i18n.language)} ${headline.currency}`
-                : '0,00 MKD'}
+                : '0 MKD'}
             </span>
           </div>
           <p className="overview-subtext">{t('overview.acrossAccounts', { count: accounts.length })}</p>
@@ -100,7 +112,7 @@ export function OverviewPage() {
                 <span className="mini-stat-figure">
                   {formatAmount(stat.amount, i18n.language)} MKD
                 </span>
-                <Delta percent={stat.delta} invert={stat.invert} />
+                <Delta percent={stat.delta} invert={stat.invert} context={t(`overview.vsPrevious.${period}`)} />
               </div>
             ))}
           </div>

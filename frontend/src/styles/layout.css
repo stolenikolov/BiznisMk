@@ -150,6 +150,11 @@
   height: 17px;
 }
 
+/* Only on narrow screens, where the tabs fold into a menu. */
+.topnav-menu-button {
+  display: none;
+}
+
 .shell-content {
   flex: 1;
   min-width: 0;
@@ -157,16 +162,6 @@
   max-width: var(--page-max);
   margin: 0 auto;
   padding: var(--space-8) var(--space-6) var(--space-20);
-}
-
-.company-switcher select {
-  font-family: var(--font-sans);
-  font-size: var(--text-caption);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-control);
-  background: var(--surface-2);
-  border: 1px solid var(--hairline);
-  color: var(--text-secondary);
 }
 
 .sr-only {
@@ -352,46 +347,96 @@
   .shell-content {
     padding: var(--space-6) var(--space-4) var(--space-12);
   }
+}
 
-  .overview-row--balance,
-  .overview-row--flow {
-    grid-template-columns: 1fr;
+/* Phones: one row of wordmark, tools and a menu button; the six tabs open as a
+   full-width list under it rather than scrolling sideways out of sight. */
+@media (max-width: 720px) {
+  .topnav {
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-2) var(--space-4);
   }
 
-  .mini-stats {
-    grid-template-columns: 1fr;
+  .topnav-left {
+    display: contents;
+  }
+
+  .topnav .brand {
+    order: 1;
+    margin-right: auto;
+  }
+
+  .topnav-right {
+    order: 2;
+    flex-wrap: nowrap;
+    gap: var(--space-1);
+  }
+
+  .topnav-divider {
+    display: none;
+  }
+
+  /* A finger needs more than the desktop's 30px. */
+  .topnav .icon-button,
+  .topnav .avatar-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .topnav-menu-button {
+    display: inline-flex;
+  }
+
+  .topnav-tabs {
+    order: 3;
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    overflow: visible;
+    padding: var(--space-2) 0;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .topnav.is-menu-open .topnav-tabs {
+    display: flex;
+  }
+
+  .topnav-tabs a {
+    padding: var(--space-3);
+    border-radius: var(--radius-control);
+    font-size: var(--text-body);
+  }
+
+  .topnav-tabs a.active {
+    background: var(--surface-2);
+  }
+
+  /* The underline becomes a bar down the left of the current section. */
+  .topnav-tabs a.active::after {
+    top: var(--space-2);
+    bottom: var(--space-2);
+    right: auto;
+    width: 2px;
+    height: auto;
+  }
+
+  /* The accounts page's card strip wraps into rows instead of scrolling. */
+  .accounts-strip {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    overflow-x: visible;
+  }
+
+  .shell-content {
+    padding: var(--space-5) var(--space-4) var(--space-12);
   }
 }
 
 .dashboard-placeholder {
   margin-top: var(--space-4);
   color: var(--text-muted);
-}
-
-.settings-pending {
-  margin-top: var(--space-6);
-  max-width: 520px;
-}
-
-.settings-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.settings-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--hairline);
-  font-size: var(--text-body-sm);
-  color: var(--text-secondary);
-}
-
-.settings-list li:last-child {
-  border-bottom: none;
 }
 
 .not-found {
@@ -436,6 +481,7 @@
   align-items: center;
   gap: var(--space-3);
 }
+
 
 .public-content {
   flex: 1;
@@ -513,4 +559,153 @@
 .theme-toggle svg {
   width: 14px;
   height: 14px;
+}
+
+/* Public footer — the closing band under every public page. A hairline, the
+   header's own 1200px column, then the wordmark, two link lists and the
+   contact details; a second hairline separates the copyright row. */
+
+.public-footer {
+  border-top: 1px solid var(--hairline);
+  /* The air the landing page used to carry as its own bottom padding. */
+  margin-top: var(--space-32);
+}
+
+.public-footer-inner {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-6) var(--space-8);
+}
+
+.public-footer-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+  gap: var(--space-12) var(--space-8);
+}
+
+.public-footer-brand .brand {
+  font-size: var(--text-body-lg);
+}
+
+.public-footer-tagline {
+  margin-top: var(--space-3);
+  max-width: 280px;
+  font-size: var(--text-body-sm);
+  letter-spacing: var(--track-body-sm);
+  color: var(--text-muted);
+}
+
+.public-footer-col h2 {
+  margin-bottom: var(--space-4);
+}
+
+.public-footer-col ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.public-footer-col a {
+  font-size: var(--text-body-sm);
+  letter-spacing: var(--track-body-sm);
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+.public-footer-col a:hover {
+  color: var(--text-primary);
+}
+
+/* Contact rows: a faint glyph, then the value. */
+.public-footer-contact li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-body-sm);
+  letter-spacing: var(--track-body-sm);
+  color: var(--text-secondary);
+}
+
+.public-footer-icon {
+  display: flex;
+  flex: none;
+  /* Sits on the first line of the value, not the middle of a wrapped row. */
+  padding-top: 2px;
+  color: var(--text-faint);
+}
+
+.public-footer-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.public-footer-contact .num {
+  font-size: var(--text-caption);
+}
+
+.public-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-top: var(--space-12);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--hairline);
+}
+
+.public-footer-bottom p {
+  font-size: var(--text-caption);
+  letter-spacing: var(--track-caption);
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .public-footer-top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .public-footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Phones: one row — the wordmark, then the theme toggle, sign in and get
+   started. The language switcher is left out; the site stays in its default,
+   Macedonian. */
+@media (max-width: 560px) {
+  .public-header {
+    flex-wrap: nowrap;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .public-content {
+    padding: 0 var(--space-4);
+  }
+
+  .public-header-actions {
+    gap: var(--space-2);
+  }
+
+  .public-header .language-switcher {
+    display: none;
+  }
+
+  .public-header .nav-link {
+    padding: var(--space-2);
+  }
+
+  .public-footer-inner {
+    padding: var(--space-12) var(--space-4) var(--space-6);
+  }
+
+  .public-footer-top {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
 }

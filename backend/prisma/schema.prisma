@@ -23,11 +23,98 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  /// Email two-factor: when on, a password alone does not sign in — a code
+  /// sent to the login address has to follow, unless the browser is trusted.
+  /// It belongs to the person, not to a company membership.
+  twoFactorEnabled   Boolean   @default(false)
+  twoFactorEnabledAt DateTime?
+
+  /// Wrong passwords in a row. Reaching the limit locks the account for a
+  /// while, however many addresses the guesses come from; a successful
+  /// sign-in or a password reset clears both.
+  failedLoginCount Int       @default(0)
+  lockedUntil      DateTime?
+
   memberships   CompanyMembership[]
   refreshTokens RefreshToken[]
+  passwordResetTokens PasswordResetToken[]
   employeeLinks Employee[]          @relation("EmployeeUserAccount")
+  notifications Notification[]
+  twoFactorChallenges TwoFactorChallenge[]
+  trustedDevices      TrustedDevice[]
+  auditLogs           AuditLog[]
 
   @@map("users")
+}
+
+/// What a two-factor code was sent to confirm.
+enum TwoFactorPurpose {
+  LOGIN
+  ENABLE
+  DISABLE
+}
+
+/// One emailed six-digit code and the attempts made against it.
+///
+/// Only a keyed hash of the code is stored, bound to this row's id. A code
+/// works for 10 minutes, once, and for at most 5 wrong guesses — after that
+/// the challenge is dead and a new one has to be asked for. A newer challenge
+/// for the same user and purpose ends the older ones.
+model TwoFactorChallenge {
+  id         String           @id @default(cuid())
+  userId     String           @map("user_id")
+  purpose    TwoFactorPurpose
+  codeHash   String           @map("code_hash")
+  attempts   Int              @default(0)
+  expiresAt  DateTime         @map("expires_at")
+  consumedAt DateTime?        @map("consumed_at")
+  /// When the current code was emailed; a resend waits 60 seconds from it.
+  lastSentAt DateTime         @map("last_sent_at")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  ip         String?
+  userAgent  String?          @map("user_agent")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("two_factor_challenges")
+}
+
+/// A browser that passed two-factor with "remember this device" ticked. It
+/// holds a random token in an httpOnly cookie; only the token's hash is here.
+/// Revoking a device deletes its row, so the cookie stops matching anything.
+model TrustedDevice {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  tokenHash  String   @unique @map("token_hash")
+  userAgent  String   @map("user_agent")
+  ip         String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  lastUsedAt DateTime @default(now()) @map("last_used_at")
+  expiresAt  DateTime @map("expires_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("trusted_devices")
+}
+
+/// Security-relevant events on an account, append-only. `action` is a short
+/// code (see AuditAction in src/audit); `metadata` never holds a secret — no
+/// codes, no tokens, no passwords. Kept when the user is deleted, detached.
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  action    String
+  metadata  Json?
+  ip        String?
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("audit_logs")
 }
 
 /// A hashed refresh token issued to a User. Refresh tokens are rotated on
@@ -42,10 +129,36 @@ model RefreshToken {
   replacedBy  String?
   createdAt   DateTime  @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// The company this session is working in. A user with several companies
+  /// picks one after signing in; the access token carries it, and this is
+  /// what lets rotation carry it on rather than dropping the session back to
+  /// "no company". Null until a company is entered; cleared if it is closed.
+  companyId   String?
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@map("refresh_tokens")
+}
+
+/// A one-time link for setting a new password, sent by email when the owner
+/// has forgotten theirs. Only the token's hash is stored: the token itself
+/// exists in the email alone, so a copy of the database cannot reset anyone.
+/// A link is spent once it is used, once it expires, or once a newer one is
+/// requested.
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
 }
 
 /// The legal form a company is registered under. Determines the suffix shown
@@ -58,7 +171,7 @@ enum CompanyLegalForm {
   OTHER
 }
 
-/// A tenant. All company-scoped data (employees, invoices, schedules, ...)
+/// A tenant. All company-scoped data (employees, invoices, schedule, ...)
 /// hangs off this model. Locale/currency/VAT fields are kept per-company
 /// (rather than hardcoded) so the app can extend beyond North Macedonia later.
 model Company {
@@ -81,37 +194,95 @@ model Company {
   country        String   @default("MK")
   currency       String   @default("MKD")
   defaultVatRate Decimal  @default(18.0) @map("default_vat_rate") @db.Decimal(5, 2)
+
+  /// Day of the month salaries are paid on, 1-31. Null until the company sets
+  /// one: a company with no configured payday simply gets no payday reminders,
+  /// because guessing a payday is worse than staying quiet. A day past the end
+  /// of a short month falls back to that month's last day.
+  paydayDayOfMonth Int? @map("payday_day_of_month")
+
+  /// Contact details, optional; set in Settings rather than at registration.
+  phone   String?
+  website String?
+
+  /// What employees see as the sender of schedules and messages. Null means
+  /// the company name.
+  emailSenderName String? @map("email_sender_name")
+  /// Where employees' replies go. Null means whoever published or sent.
+  emailReplyTo    String? @map("email_reply_to")
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  memberships  CompanyMembership[]
-  employees    Employee[]
-  invoices     Invoice[]
-  schedules    Schedule[]
-  bankAccounts BankAccount[]
-  transactions Transaction[]
+  memberships   CompanyMembership[]
+  employees     Employee[]
+  invoices      Invoice[]
+  shiftTemplates  ShiftTemplate[]
+  scheduleEntries ScheduleEntry[]
+  scheduleWeeks   ScheduleWeek[]
+  bankAccounts  BankAccount[]
+  transactions  Transaction[]
+  notifications Notification[]
+  payrollRuns   PayrollRun[]
+  sessions      RefreshToken[]
 
   @@map("companies")
+}
+
+/// Standing of an account at the bank. Mirrors what the bank integration
+/// reports, so a blocked account can be shown as blocked rather than silently
+/// looking like an ordinary one.
+enum BankAccountStatus {
+  ACTIVE
+  BLOCKED
+  CLOSED
 }
 
 /// A company transaction account. Balance is stored here for now; once the
 /// transactions module exists it will be derived from posted entries instead.
 model BankAccount {
-  id        String   @id @default(uuid())
+  id        String            @id @default(uuid())
   companyId String
-  bankName  String   @map("bank_name")
-  iban      String
-  currency  String   @default("MKD")
-  balance   Decimal  @default(0) @db.Decimal(14, 2)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  bankName  String            @map("bank_name")
+  /// Unique across every company, not just within one: an account is one
+  /// company's, as the bank says when it is linked, and the bank's events are
+  /// routed to a company by IBAN alone.
+  iban      String            @unique
+  /// Who the account is in the name of: the owner of the company that
+  /// connected it. Null on accounts connected before this was recorded.
+  holderName String?          @map("holder_name")
+  currency  String            @default("MKD")
+  balance   Decimal           @default(0) @db.Decimal(14, 2)
+  status    BankAccountStatus @default(ACTIVE)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
   company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   transactions Transaction[]
+  creditLine   CreditLine?
 
-  @@unique([companyId, iban])
   @@index([companyId])
   @@map("bank_accounts")
+}
+
+/// An active loan against one account, as the bank reports it. Absent for the
+/// majority of accounts — the finance page branches on that rather than
+/// showing a zeroed-out loan.
+model CreditLine {
+  id                String   @id @default(uuid())
+  bankAccountId     String   @unique @map("bank_account_id")
+  creditAmount      Decimal  @map("credit_amount") @db.Decimal(14, 2)
+  remainingBalance  Decimal  @map("remaining_balance") @db.Decimal(14, 2)
+  nextPaymentDate   DateTime @map("next_payment_date")
+  installmentAmount Decimal  @map("installment_amount") @db.Decimal(14, 2)
+  totalInstallments Int      @map("total_installments")
+  installmentsPaid  Int      @default(0) @map("installments_paid")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  bankAccount BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+
+  @@map("credit_lines")
 }
 
 enum TransactionDirection {
@@ -135,6 +306,12 @@ model Transaction {
   id            String               @id @default(uuid())
   companyId     String
   bankAccountId String               @map("bank_account_id")
+
+  /// The bank's own id for this movement, when it came from the bank rather
+  /// than from us. Webhooks are retried until they are acknowledged, so this
+  /// is what makes a redelivery a no-op instead of a second transaction.
+  /// Null on rows we booked ourselves, such as an invoice settlement.
+  externalId    String?              @map("external_id")
   description   String
   category      TransactionCategory  @default(OTHER)
   direction     TransactionDirection
@@ -145,6 +322,9 @@ model Transaction {
   company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
   bankAccount BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
 
+  // Scoped to the account rather than global: two banks may well hand out
+  // the same id, and they are only ever compared within one account.
+  @@unique([bankAccountId, externalId])
   @@index([companyId, bookedAt])
   @@index([bankAccountId])
   @@map("transactions")
@@ -176,34 +356,104 @@ model CompanyMembership {
   @@map("company_memberships")
 }
 
+/// Whether someone is at work today. Anything other than ACTIVE is shown as a
+/// tag on the employee list and counted in the "on leave" figure.
 enum EmployeeStatus {
   ACTIVE
   ON_LEAVE
-  TERMINATED
+  SICK_LEAVE
 }
 
-/// Stub — will grow to cover contracts, salary history, documents, etc.
-/// `userId` is nullable and only set once an employee is given self-service
-/// login access; most employees will not have a User account at all.
+/// Why someone is away on one planned day of the schedule. The same names as
+/// the matching EmployeeStatus values, so a day away reads the same whether
+/// it came from the grid or from the employee's status.
+enum LeaveType {
+  ON_LEAVE
+  SICK_LEAVE
+}
+
+/// A person on the company's payroll.
+///
+/// `role` reuses CompanyRole so the team list and the access model speak the
+/// same three roles. It describes the job, not a login: `userId` is nullable
+/// and only set once an employee is given self-service access, which most
+/// employees will never have.
 model Employee {
-  id         String         @id @default(uuid())
-  companyId  String
-  userId     String?
-  firstName  String
-  lastName   String
-  position   String?
-  baseSalary Decimal?       @map("base_salary") @db.Decimal(12, 2)
-  status     EmployeeStatus @default(ACTIVE)
-  hiredAt    DateTime?      @map("hired_at")
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  id        String  @id @default(uuid())
+  companyId String
+  userId    String?
 
-  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  userAccount User?    @relation("EmployeeUserAccount", fields: [userId], references: [id], onDelete: SetNull)
-  schedules Schedule[]
+  firstName String
+  lastName  String
+  /// Null until real uploads exist; the UI falls back to an initials avatar.
+  photoUrl  String? @map("photo_url")
+  email     String
+  phone     String
+  role      CompanyRole    @default(EMPLOYEE)
+  status    EmployeeStatus @default(ACTIVE)
 
+  /// Monthly gross, in the company's currency. Net pay is derived from it.
+  salary   Decimal  @db.Decimal(12, 2)
+  hireDate DateTime @map("hire_date") @db.Date
+
+  vacationDaysTotal     Int @default(20) @map("vacation_days_total")
+  vacationDaysRemaining Int @map("vacation_days_remaining")
+
+  /// The account salaries are paid into. Stored normalised: no spaces, upper case.
+  iban String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company     Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userAccount User?      @relation("EmployeeUserAccount", fields: [userId], references: [id], onDelete: SetNull)
+  scheduleEntries ScheduleEntry[]
+
+  // One contact address per person inside a company; the same person may
+  // well work for two companies.
+  @@unique([companyId, email])
   @@index([companyId])
   @@map("employees")
+}
+
+/// Statutory payroll parameters for one country and one tax year.
+///
+/// UJP publishes a new personal allowance every January (10,270 MKD a month
+/// in 2025, 10,932 in 2026), and the rates change whenever the law does. A row
+/// per year makes each change a data update instead of a deploy, and keeps
+/// past years intact for recalculating an old month. A salary uses the row for
+/// the year the salary is *for*, not the year it is paid in.
+///
+/// There is deliberately no fallback to an earlier year: a January payroll run
+/// against last year's allowance would be wrong, so a missing year is reported
+/// as missing.
+model TaxSettings {
+  id      String @id @default(uuid())
+  country String @default("MK")
+  year    Int
+
+  /// Monthly personal allowance (лично ослободување), in the country's currency.
+  personalAllowanceMonthly Decimal @map("personal_allowance_monthly") @db.Decimal(12, 2)
+  /// Flat personal income tax, in percent: 10.00 means 10%.
+  incomeTaxRate            Decimal @map("income_tax_rate") @db.Decimal(5, 2)
+  /// All employee social contributions together, in percent of gross: 28.00.
+  /// Only the total is kept — it is all the net calculation needs, and the
+  /// split between funds moves more often than the total does.
+  contributionsRate        Decimal @map("contributions_rate") @db.Decimal(5, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([country, year])
+  @@map("tax_settings")
+}
+
+/// Which way an invoice points. OUTGOING is one we issued and expect to be
+/// paid; INCOMING is a supplier bill we owe. The two settle in opposite
+/// directions, so paying one credits an account and paying the other debits it.
+enum InvoiceDirection {
+  OUTGOING
+  INCOMING
 }
 
 enum InvoiceStatus {
@@ -214,43 +464,271 @@ enum InvoiceStatus {
   CANCELLED
 }
 
-/// Stub — will grow to cover line items, VAT breakdown, PDF snapshots, etc.
+/// An issued invoice. Totals are computed by `calculateInvoiceTotals` and then
+/// stored here rather than recomputed on read: an invoice is a legal document,
+/// so the figures must stay exactly as issued even if the company's VAT status
+/// or default rate changes later.
 model Invoice {
-  id            String        @id @default(uuid())
-  companyId     String
-  invoiceNumber String        @map("invoice_number")
-  clientName    String        @map("client_name")
-  totalAmount   Decimal       @map("total_amount") @db.Decimal(12, 2)
-  currency      String        @default("MKD")
-  status        InvoiceStatus @default(DRAFT)
-  issueDate     DateTime      @map("issue_date")
-  dueDate       DateTime?     @map("due_date")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id        String @id @default(uuid())
+  companyId String
 
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  direction InvoiceDirection @default(OUTGOING)
 
-  @@unique([companyId, invoiceNumber])
-  @@index([companyId])
+  /// The rendered number shown on the document, e.g. "0001/2026". For an
+  /// INCOMING bill this is the supplier's own number, kept verbatim.
+  invoiceNumber String @map("invoice_number")
+  /// The year and per-year counter behind `invoiceNumber`, for invoices we
+  /// issue. Null on INCOMING bills: those must never consume a number out of
+  /// our own sequence.
+  year          Int?
+  sequence      Int?
+
+  clientName    String  @map("client_name")
+  clientAddress String  @map("client_address")
+  /// Client's ЕДБ. Optional: invoices issued to a natural person carry none.
+  clientEdb     String? @map("client_edb")
+
+  /// Frozen at issue time. `vatAmount` is zero and `vatApplied` false for a
+  /// company outside the ДДВ system — such an invoice shows no VAT row at all.
+  netAmount   Decimal @map("net_amount") @db.Decimal(12, 2)
+  vatAmount   Decimal @map("vat_amount") @db.Decimal(12, 2)
+  totalAmount Decimal @map("total_amount") @db.Decimal(12, 2)
+  vatApplied  Boolean @map("vat_applied")
+
+  currency  String        @default("MKD")
+  status    InvoiceStatus @default(DRAFT)
+  issueDate DateTime      @map("issue_date")
+  dueDate   DateTime?     @map("due_date")
+  notes     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  /// Where the money went when the invoice was marked paid. Null until then.
+  settledAccountId     String?  @map("settled_account_id")
+  settledTransactionId String?  @unique @map("settled_transaction_id")
+  settledAt            DateTime? @map("settled_at")
+
+  company Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lines   InvoiceLineItem[]
+
+  // Our own numbers are unique by construction: they are rendered from
+  // (year, sequence), and that pair is what the database enforces. A supplier
+  // bill carries somebody else's number and must not compete for the same
+  // name — two companies can both issue an "0002/2026". Duplicate supplier
+  // bills are caught in the service, per supplier, where the rule belongs.
+  @@unique([companyId, year, sequence])
+  @@index([companyId, issueDate])
   @@map("invoices")
 }
 
-/// Stub — a single scheduled shift for an employee. Will grow to cover
-/// recurrence, shift templates, and leave-request integration.
-model Schedule {
-  id         String   @id @default(uuid())
-  companyId  String
-  employeeId String
-  date       DateTime @db.Date
-  startTime  DateTime @map("start_time")
-  endTime    DateTime @map("end_time")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+/// A single line on an invoice. `netAmount` is stored alongside the inputs for
+/// the same reason the invoice totals are: the document must not change.
+model InvoiceLineItem {
+  id        String @id @default(uuid())
+  invoiceId String @map("invoice_id")
 
-  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Decimal  @db.Decimal(12, 3)
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(12, 2)
+  /// Percent, e.g. 18. Null on invoices from a non-VAT-payer.
+  vatRate     Decimal? @map("vat_rate") @db.Decimal(5, 2)
+  netAmount   Decimal  @map("net_amount") @db.Decimal(12, 2)
+  /// Preserves the order the lines were entered in.
+  position    Int
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@unique([invoiceId, position])
+  @@index([invoiceId])
+  @@map("invoice_line_items")
+}
+
+/// A shift the company works, as the company itself defines it: "Прва смена"
+/// 07:00–15:00, or a single 09:00–17:00, or four overlapping ones. Nothing in
+/// code assumes a morning/afternoon/night pattern.
+///
+/// Times are wall-clock times of day, stored as TIME because they repeat every
+/// week. An end at or before the start is a shift that runs past midnight
+/// (22:00–06:00 is eight hours); an end equal to the start is refused.
+model ShiftTemplate {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  label     String
+  startTime DateTime @map("start_time") @db.Time(0)
+  endTime   DateTime @map("end_time") @db.Time(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  company Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  entries ScheduleEntry[]
 
   @@index([companyId])
-  @@index([employeeId])
-  @@map("schedules")
+  @@map("shift_templates")
+}
+
+/// One employee's assignment for one day. At most one row per employee per
+/// day. A null template means no shift that day — which is also what deleting
+/// a template leaves behind, via ON DELETE SET NULL, so no row can ever point
+/// at a template that no longer exists.
+///
+/// `dayOff` marks the day as deliberately free ("Слободен/на"), which the
+/// employee is told about, as opposed to a day nobody has planned yet. A day
+/// off never carries a template; a CHECK constraint holds that.
+///
+/// `leave` marks one planned day away — a day of holiday or sick leave the
+/// manager put in the grid. It stands alone: no shift and no day off with it,
+/// another CHECK constraint. It is separate from the employee's own status,
+/// which has no dates and locks every day from today on.
+model ScheduleEntry {
+  id              String   @id @default(uuid())
+  companyId       String   @map("company_id")
+  employeeId      String   @map("employee_id")
+  date            DateTime @db.Date
+  shiftTemplateId String?  @map("shift_template_id")
+  dayOff          Boolean  @default(false) @map("day_off")
+  leave           LeaveType?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  company       Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employee      Employee       @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  shiftTemplate ShiftTemplate? @relation(fields: [shiftTemplateId], references: [id], onDelete: SetNull)
+
+  @@unique([employeeId, date])
+  // The week grid reads one company's rows for seven consecutive days.
+  @@index([companyId, date])
+  @@index([shiftTemplateId])
+  @@map("schedule_entries")
+}
+
+/// Publication state of one company week (Monday to Sunday).
+///
+/// A published week is locked: its entries cannot change until it is
+/// unlocked. `publishedSnapshot` is what employees were last told — per
+/// employee, per day, the shift's label and times — so publishing again
+/// notifies only the people whose own days actually changed, including a
+/// change that came from editing a template's times.
+model ScheduleWeek {
+  id                String    @id @default(uuid())
+  companyId         String    @map("company_id")
+  weekStart         DateTime  @map("week_start") @db.Date
+  lockedAt          DateTime? @map("locked_at")
+  publishedAt       DateTime? @map("published_at")
+  publishedSnapshot Json?     @map("published_snapshot")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, weekStart])
+  @@map("schedule_weeks")
+}
+
+/// What happened. The frontend renders its own localised copy from this plus
+/// `metadata`, so adding a language never means rewriting stored rows.
+enum NotificationType {
+  /// Money left a company account.
+  ACCOUNT_OUTFLOW
+  /// Money landed on a company account.
+  ACCOUNT_INFLOW
+  /// An unpaid invoice is coming up on its due date.
+  INVOICE_DUE
+  /// A loan instalment is coming up on its payment date.
+  LOAN_INSTALLMENT_DUE
+  /// The company's payday is coming up.
+  EMPLOYEE_PAYDAY
+  /// A week of the schedule was published and this person's shifts in it changed.
+  SCHEDULE_PUBLISHED
+}
+
+/// One thing worth telling a company about.
+///
+/// Every row is company-scoped. `userId` is null for the common case — a
+/// notification the whole company sees — and set only when something concerns
+/// one person; readers filter on `companyId AND (userId IS NULL OR userId =
+/// me)`, so a company-wide row reaches everyone without being duplicated per
+/// member.
+///
+/// `title` and `message` are rendered server-side in Macedonian and stored so
+/// a row is readable on its own (in the database, in a future email digest).
+/// The UI prefers its own translation of `type` + `metadata` and falls back to
+/// these, which is what keeps the notification centre bilingual.
+model Notification {
+  id        String  @id @default(uuid())
+  companyId String  @map("company_id")
+  /// Null when the notification is for the whole company.
+  userId    String? @map("user_id")
+
+  type    NotificationType
+  title   String
+  message String
+  /// Everything the UI needs to render and link the row: amounts, account
+  /// names, due dates, the source record's id.
+  metadata Json @default("{}")
+
+  /// What the notification points at, e.g. "transaction" / "invoice" /
+  /// "creditLine" / "company". Deliberately a string rather than an enum: new
+  /// notification sources should not require a migration to link to.
+  relatedEntityType String? @map("related_entity_type")
+  relatedEntityId   String? @map("related_entity_id")
+
+  /// Identifies the real-world event behind a scheduled reminder, e.g.
+  /// "INVOICE_DUE:<id>:2026-09-18:3". The daily job writes one row per event
+  /// per run window, and this unique key is what makes a re-run — or two
+  /// instances running at once — a no-op instead of a duplicate. Null on
+  /// event-driven notifications, which are never re-derived and so cannot
+  /// duplicate; Postgres treats nulls as distinct, so they do not collide.
+  dedupeKey String? @map("dedupe_key")
+
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, dedupeKey])
+  // The notification centre reads one company's rows newest first.
+  @@index([companyId, createdAt])
+  // The unread badge counts against this.
+  @@index([companyId, isRead])
+  @@map("notifications")
+}
+
+/// One payroll period that has been paid.
+///
+/// A row means the salaries for `period` are out the door — it is what the
+/// "pay salaries" button reads to know it has nothing left to do. Written by
+/// the app's own run and by a `PAYROLL_COMPLETED` webhook alike, because a run
+/// approved at the bank rather than here is just as paid. The unique
+/// `bankRequestId` is what makes those two paths — and a redelivered webhook —
+/// land on one row instead of three.
+///
+/// The figures are what the bank actually moved, not what was asked for: a run
+/// recorded from an event is all we know about it, and the two must agree.
+model PayrollRun {
+  id        String @id @default(uuid())
+  companyId String @map("company_id")
+
+  /// First day of the month the salaries are for, as a DATE — one payroll per
+  /// company per month, which is what the unique constraint below says.
+  period DateTime @db.Date
+
+  currency      String
+  /// Everything the run moved: net pay plus the contributions and income
+  /// tax withheld from the same gross.
+  totalAmount  Decimal @map("total_amount") @db.Decimal(14, 2)
+  /// Transfers in the run: one per person paid, plus the statutory ones.
+  paymentCount Int     @map("payment_count")
+
+  /// The bank's own id for the run. Null only on a run recorded from an event
+  /// that carried none; Postgres treats nulls as distinct, so those coexist.
+  bankRequestId String? @unique @map("bank_request_id")
+
+  paidAt    DateTime @map("paid_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, period])
+  @@map("payroll_runs")
 }

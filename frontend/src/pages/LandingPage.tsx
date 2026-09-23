@@ -1,26 +1,32 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FinanceIcon, ImageIcon, InvoiceIcon, TeamIcon } from '../components/icons.tsx';
+import { FinanceIcon, InvoiceIcon, TeamIcon } from '../components/icons.tsx';
+import { ScaledPreview } from '../components/landing/ScaledPreview.tsx';
+import {
+  FinancePreview,
+  InvoicesPreview,
+  OverviewPreview,
+  SchedulePreview,
+} from '../components/landing/Previews.tsx';
 import { useReveal } from '../lib/useReveal.ts';
 
+/** Each band's picture, and the desktop width it is laid out at before scaling. */
 const BANDS = [
-  { key: 'finance', Icon: FinanceIcon },
-  { key: 'team', Icon: TeamIcon },
-  { key: 'invoices', Icon: InvoiceIcon },
+  { key: 'finance', Icon: FinanceIcon, Preview: FinancePreview, width: 900 },
+  { key: 'team', Icon: TeamIcon, Preview: SchedulePreview, width: 1100 },
+  { key: 'invoices', Icon: InvoiceIcon, Preview: InvoicesPreview, width: 880 },
 ] as const;
 
-/** Stand-in for a product screenshot until the real screen exists. */
-function PreviewFrame({ caption, hero = false }: { caption: string; hero?: boolean }) {
+/** A product picture, revealed as it scrolls into view. */
+function PreviewFrame({ label, width, children }: { label: string; width: number; children: ReactNode }) {
   const { ref, revealed } = useReveal<HTMLDivElement>();
 
   return (
-    <div ref={ref} className={`ui-frame reveal${revealed ? ' is-revealed' : ''}`}>
-      <div className={`frame-placeholder${hero ? ' frame-placeholder--hero' : ''}`}>
-        <span className="frame-placeholder-icon">
-          <ImageIcon />
-        </span>
-        <span className="caption">{caption}</span>
-      </div>
+    <div ref={ref} className={`ui-frame ui-frame--preview reveal${revealed ? ' is-revealed' : ''}`}>
+      <ScaledPreview width={width} label={label}>
+        {children}
+      </ScaledPreview>
     </div>
   );
 }
@@ -44,10 +50,16 @@ export function LandingPage() {
         </div>
       </section>
 
-      <PreviewFrame caption={t('landing.preview.dashboard')} hero />
+      <PreviewFrame label={t('landing.preview.dashboard')} width={1240}>
+        <OverviewPreview />
+      </PreviewFrame>
 
-      {BANDS.map(({ key, Icon }, index) => (
-        <section key={key} className={`landing-band${index % 2 === 1 ? ' landing-band--reverse' : ''}`}>
+      {BANDS.map(({ key, Icon, Preview, width }, index) => (
+        <section
+          key={key}
+          id={`feature-${key}`}
+          className={`landing-band${index % 2 === 1 ? ' landing-band--reverse' : ''}`}
+        >
           <div className="landing-band-copy">
             <span className="landing-band-icon">
               <Icon />
@@ -55,7 +67,9 @@ export function LandingPage() {
             <h2>{t(`landing.features.${key}.title`)}</h2>
             <p>{t(`landing.features.${key}.description`)}</p>
           </div>
-          <PreviewFrame caption={t('landing.preview.pending')} />
+          <PreviewFrame label={t(`landing.preview.${key}`)} width={width}>
+            <Preview />
+          </PreviewFrame>
         </section>
       ))}
     </div>

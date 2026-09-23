@@ -1,5 +1,6 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { TransactionsService } from './transactions.service.js';
+import { parseDate, parseGranularity, parsePeriodPreset } from './finance-period.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { CompanyRolesGuard } from '../auth/guards/company-roles.guard.js';
@@ -18,9 +19,30 @@ export class TransactionsController {
     return { transactions: await this.transactions.findRecent(user.companyId!) };
   }
 
-  /** Aggregates behind the dashboard overview. */
+  /** Aggregates behind the dashboard overview, for this month, quarter or year. */
   @Get('overview')
-  async overview(@CurrentUser() user: AuthenticatedUser) {
-    return this.transactions.buildOverview(user.companyId!);
+  async overview(@CurrentUser() user: AuthenticatedUser, @Query('period') period?: string) {
+    return this.transactions.buildOverview(user.companyId!, parsePeriodPreset(period));
+  }
+
+  /**
+   * Aggregates behind the finance page: summary and categories for the selected
+   * period, plus the trend series at its own granularity. Unrecognised query
+   * values fall back to this month / 30 days rather than failing the request.
+   */
+  @Get('finance')
+  async finance(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query('period') period?: string,
+    @Query('granularity') granularity?: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+  ) {
+    return this.transactions.buildFinance(user.companyId!, {
+      preset: parsePeriodPreset(period),
+      granularity: parseGranularity(granularity),
+      from: parseDate(from),
+      to: parseDate(to),
+    });
   }
 }

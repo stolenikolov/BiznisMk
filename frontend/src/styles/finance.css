@@ -1,0 +1,694 @@
+/* Finance page.
+
+   Surfaces, type and the single accent come from the app's own tokens, so this
+   screen sits in the same system as every other one. What is local to finance
+   is the *data* palette: series and category colours were picked for
+   colourblind-safety and must not be re-derived per chart, and the status
+   colours are fixed in both themes because they always carry meaning. */
+
+.finance {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+
+  /* Data colours — dark theme. */
+  --series-income: #3987e5;
+  --series-expense: #d95926;
+  --cat-1: #3987e5;
+  --cat-2: #d95926;
+  --cat-3: #199e70;
+  --cat-4: #c98500;
+  --cat-5: #d55181;
+  --cat-6: #008300;
+
+  /* Status — identical in both themes, and never the only signal: every use
+     sits next to a word. */
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-critical: #d03b3b;
+}
+
+:root[data-theme='light'] .finance {
+  --series-income: #2a78d6;
+  --series-expense: #eb6834;
+  --cat-1: #2a78d6;
+  --cat-2: #eb6834;
+  --cat-3: #1baf7a;
+  --cat-4: #eda100;
+  --cat-5: #e87ba4;
+  --cat-6: #008300;
+}
+
+/* Header ------------------------------------------------------------------ */
+
+.finance-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.finance-head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Period menu — a pill that opens its presets, plus an optional custom range. */
+
+.period-menu {
+  position: relative;
+}
+
+.period-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 9px var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.period-trigger:hover {
+  border-color: var(--hairline-strong);
+}
+
+.period-trigger svg {
+  width: 12px;
+  height: 12px;
+  color: var(--text-muted);
+}
+
+.period-popover {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 20;
+  min-width: 240px;
+  padding: var(--space-2);
+  background: var(--surface-1);
+  border-radius: var(--radius-card);
+  box-shadow: var(--hairline-strong) 0 0 0 1px inset;
+}
+
+.period-popover button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-control);
+  background: none;
+  font-family: var(--font-sans);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.period-popover button:hover {
+  background: var(--surface-2);
+  color: var(--text-primary);
+}
+
+.period-popover button.is-selected {
+  color: var(--text-primary);
+}
+
+.period-custom {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  margin-top: var(--space-1);
+  border-top: 1px solid var(--hairline);
+}
+
+.period-custom label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-label);
+  color: var(--text-muted);
+}
+
+.period-custom input {
+  padding: 6px var(--space-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-control);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+}
+
+/* Stat row ---------------------------------------------------------------- */
+
+.finance-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+}
+
+.stat-value {
+  font-size: 1.625rem;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--track-subheading);
+  color: var(--text-primary);
+}
+
+.stat-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+/* Direction is per metric: more spending is not good news, so the arrow and
+   the colour are set by the caller, not by the sign of the number. */
+.stat-delta.is-good {
+  color: var(--status-good);
+}
+
+.stat-delta.is-bad {
+  color: var(--status-critical);
+}
+
+.stat-delta svg {
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+}
+
+/* Trend + categories ------------------------------------------------------ */
+
+.finance-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+/* A chart's canvas keeps the width it was drawn at; without this its cell
+   could not shrink when the screen does. */
+.finance-row > * {
+  min-width: 0;
+}
+
+.finance-card-title {
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.trend-legend {
+  display: flex;
+  gap: var(--space-5);
+  padding-top: var(--space-4);
+}
+
+.trend-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.trend-legend span::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+
+.trend-legend .legend-income::before {
+  background: var(--series-income);
+}
+
+.trend-legend .legend-expense::before {
+  background: var(--series-expense);
+}
+
+/* Category donut ---------------------------------------------------------- */
+
+.donut-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: var(--space-4) 0;
+}
+
+.donut-centre {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.donut-centre-label {
+  display: block;
+  font-size: var(--text-label);
+  color: var(--text-muted);
+}
+
+.donut-centre-value {
+  display: block;
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+.category-rank {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.category-rank li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 7px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.category-rank li:last-child {
+  border-bottom: none;
+}
+
+.category-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+}
+
+.category-name {
+  flex-grow: 1;
+  font-size: var(--text-caption);
+  color: var(--text-primary);
+}
+
+.category-amount {
+  color: var(--text-muted);
+}
+
+.category-pct {
+  width: 40px;
+  text-align: right;
+  color: var(--text-muted);
+}
+
+/* Accounts strip ---------------------------------------------------------- */
+
+.finance-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.finance-section-title {
+  font-size: var(--text-title);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--track-subheading);
+  color: var(--text-primary);
+}
+
+.finance-section-note {
+  margin-top: var(--space-1);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.finance-accounts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.account-chip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  color: inherit;
+  transition: background-color var(--transition);
+}
+
+.account-chip:hover {
+  background: var(--surface-2);
+}
+
+/* A blocked account is dimmed, but the word BLOCKED next to the dot is what
+   actually carries the meaning. */
+.account-chip.is-blocked {
+  opacity: 0.6;
+}
+
+.account-chip-bank {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+}
+
+.status-dot.is-active {
+  background: var(--status-good);
+}
+
+.status-dot.is-blocked {
+  background: var(--status-critical);
+}
+
+.status-word {
+  font-size: var(--text-label);
+  color: var(--text-muted);
+}
+
+.account-chip-balance {
+  font-size: var(--text-body-lg);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--track-subheading);
+  color: var(--text-primary);
+}
+
+.account-chip-iban {
+  color: var(--text-muted);
+}
+
+/* Pushed to the bottom, so cards in a row end level even when one bank's
+   name takes two lines. */
+.account-chip-link {
+  margin-top: auto;
+  padding-top: var(--space-1);
+  font-size: var(--text-label);
+  color: var(--accent-text);
+}
+
+/* Credits ----------------------------------------------------------------- */
+
+.credit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.credit-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
+.credit-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.credit-bank {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.credit-account {
+  color: var(--text-muted);
+}
+
+.credit-remaining {
+  margin-top: var(--space-1);
+  font-size: 1.375rem;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--track-subheading);
+  color: var(--text-primary);
+}
+
+.credit-progress {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.credit-progress span {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+.credit-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.credit-foot div:last-child {
+  text-align: right;
+}
+
+.credit-foot dt {
+  font-size: var(--text-label);
+  color: var(--text-muted);
+}
+
+.credit-foot dd {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-body-sm);
+  color: var(--text-primary);
+}
+
+/* Loading skeletons — shape of the thing that is coming, never stale figures
+   under a spinner. */
+
+.skeleton {
+  border-radius: var(--radius-badge);
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--surface-3) 37%,
+    var(--surface-2) 63%
+  );
+  background-size: 400% 100%;
+  animation: finance-shimmer 1.4s ease infinite;
+}
+
+.skeleton-line {
+  height: 12px;
+}
+
+.skeleton-line--value {
+  height: 26px;
+  width: 62%;
+}
+
+.skeleton-line--label {
+  height: 10px;
+  width: 44%;
+}
+
+.skeleton-line--delta {
+  height: 10px;
+  width: 70%;
+}
+
+.skeleton-block {
+  height: 220px;
+  border-radius: var(--radius-control);
+}
+
+.skeleton-donut {
+  width: 150px;
+  height: 150px;
+  border-radius: var(--radius-pill);
+  margin: var(--space-4) auto;
+}
+
+@keyframes finance-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* Responsive -------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .finance-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .finance-row {
+    grid-template-columns: 1fr;
+  }
+
+  .finance-accounts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .credit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .finance-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .finance-accounts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Phones: the actions drop under the title with the period menu first, so its
+   popover opens rightwards from the menu's left edge and spans the screen. */
+@media (max-width: 560px) {
+  .finance-head-actions {
+    flex-wrap: wrap;
+  }
+
+  .period-popover {
+    right: auto;
+    left: 0;
+    width: calc(100vw - 2 * var(--space-4));
+    min-width: 0;
+  }
+
+  .period-custom {
+    flex-wrap: wrap;
+  }
+
+  .period-custom label {
+    flex: 1 1 120px;
+  }
+}
+
+/* Account detail ---------------------------------------------------------- */
+
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+}
+
+.account-detail {
+  gap: var(--space-6);
+}
+
+.account-detail .account-detail-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.account-detail .balance-card {
+  margin-top: 0;
+  min-width: 260px;
+}
+
+.account-detail-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+/* Facts table — label above value, wrapping into columns. */
+
+.account-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+}
+
+.account-facts dt {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.account-facts dd {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-body-sm);
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.account-facts .muted {
+  color: var(--text-faint);
+}
+
+/* The loan block sits inside a card here, so it carries no card of its own. */
+.credit-card--flush {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.credit-card--flush .credit-foot {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-4);
+}
+
+.credit-card--flush .credit-foot div:last-child {
+  text-align: left;
+}
+
+.account-detail .transaction-list {
+  margin: 0;
+}

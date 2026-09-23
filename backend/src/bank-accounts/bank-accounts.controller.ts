@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { BankAccountsService } from './bank-accounts.service.js';
 import { CreateBankAccountDto } from './dto/create-bank-account.dto.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
@@ -18,6 +18,26 @@ export class BankAccountsController {
   async findAll(@CurrentUser() user: AuthenticatedUser) {
     // companyId is guaranteed by CompanyRolesGuard.
     return this.bankAccountsService.findAllForCompany(user.companyId!);
+  }
+
+  @Get(':accountId')
+  async findOne(@CurrentUser() user: AuthenticatedUser, @Param('accountId') accountId: string) {
+    return { account: await this.bankAccountsService.findOneForCompany(user.companyId!, accountId) };
+  }
+
+  /** That account's own statement, for its detail page. */
+  @Get(':accountId/transactions')
+  async findTransactions(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('accountId') accountId: string,
+    @Query('limit') limit?: string,
+  ) {
+    const take = Number(limit);
+    return this.bankAccountsService.findTransactions(
+      user.companyId!,
+      accountId,
+      Number.isFinite(take) && take > 0 ? take : 50,
+    );
   }
 
   @Post()

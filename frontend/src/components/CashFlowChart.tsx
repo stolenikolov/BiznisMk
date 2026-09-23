@@ -33,6 +33,9 @@ export function CashFlowChart({ points }: { points: CashFlowPoint[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<echarts.ECharts | null>(null);
   const [palette, setPalette] = useState(readPalette);
+  // A finger dragging over the chart is scrolling the page, not panning the
+  // chart; on touch screens pinching zooms it instead.
+  const [isTouch] = useState(() => window.matchMedia('(pointer: coarse)').matches);
 
   // The palette flips with the theme, which lives on a data attribute.
   useEffect(() => {
@@ -58,8 +61,7 @@ export function CashFlowChart({ points }: { points: CashFlowPoint[] }) {
         textStyle: { color: palette.primaryText, fontFamily: 'Inter', fontSize: 12 },
         valueFormatter: (value: number) =>
           `${value.toLocaleString(i18n.language === 'mk' ? 'de-DE' : 'en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
+            maximumFractionDigits: 0,
           })} MKD`,
       },
       xAxis: {
@@ -68,20 +70,28 @@ export function CashFlowChart({ points }: { points: CashFlowPoint[] }) {
         boundaryGap: false,
         axisLine: { lineStyle: { color: palette.grid } },
         axisTick: { show: false },
-        axisLabel: { color: palette.faint, fontFamily: 'JetBrains Mono', fontSize: 10 },
+        axisLabel: { color: palette.faint, fontFamily: 'Roboto Mono', fontSize: 10 },
       },
       yAxis: {
         type: 'value',
         splitLine: { lineStyle: { color: palette.grid, type: 'dashed' } },
         axisLabel: {
           color: palette.faint,
-          fontFamily: 'JetBrains Mono',
+          fontFamily: 'Roboto Mono',
           fontSize: 10,
           formatter: (value: number) => (value >= 1000 ? `${Math.round(value / 1000)}k` : `${value}`),
         },
       },
       // Wheel zooms the time axis; dragging pans once zoomed in.
-      dataZoom: [{ type: 'inside', zoomOnMouseWheel: true, moveOnMouseMove: true, moveOnMouseWheel: false }],
+      dataZoom: [
+        {
+          type: 'inside',
+          zoomOnMouseWheel: true,
+          moveOnMouseMove: !isTouch,
+          moveOnMouseWheel: false,
+          preventDefaultMouseMove: !isTouch,
+        },
+      ],
       series: [
         {
           name: t('overview.income'),
@@ -108,7 +118,7 @@ export function CashFlowChart({ points }: { points: CashFlowPoint[] }) {
         },
       ],
     };
-  }, [points, palette, t, i18n.language]);
+  }, [points, palette, t, i18n.language, isTouch]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -133,7 +143,7 @@ export function CashFlowChart({ points }: { points: CashFlowPoint[] }) {
   return (
     <div className="chart">
       <div ref={containerRef} style={{ height: 260, width: '100%' }} role="img" aria-label={t('overview.cashFlow')} />
-      <p className="chart-hint">{t('overview.chartHint')}</p>
+      <p className="chart-hint">{t(isTouch ? 'overview.chartHintTouch' : 'overview.chartHint')}</p>
     </div>
   );
 }

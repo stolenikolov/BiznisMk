@@ -1,0 +1,607 @@
+/* Employees — team list and the employee form. Layout only: every colour,
+   radius and border comes from tokens.css. */
+
+.employees {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.employees .page-header {
+  align-items: center;
+  margin-bottom: var(--space-1);
+}
+
+.employees-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.employees .page-header .page-title {
+  margin-bottom: var(--space-1);
+}
+
+/* Team table ----------------------------------------------------------------
+
+   One bordered card; the table runs edge to edge inside it, so the header
+   rule and the row dividers meet the card's own border. */
+
+.employee-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.employee-table-scroll {
+  overflow-x: auto;
+}
+
+.employee-table {
+  min-width: 860px;
+}
+
+.employee-table th,
+.employee-table td,
+.employee-table th:first-child,
+.employee-table td:first-child,
+.employee-table th:last-child,
+.employee-table td:last-child {
+  padding: var(--space-4) var(--space-5);
+  vertical-align: middle;
+}
+
+.employee-table th {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.employee-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Rows are not links, so they do not light up under the pointer. */
+.employee-table tbody tr:hover td {
+  background: none;
+}
+
+.employee-person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.employee-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.02em;
+  object-fit: cover;
+}
+
+.employee-name-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.employee-name {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.employee-status {
+  border-radius: var(--radius-pill);
+  padding: 1px var(--space-2);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+}
+
+/* Vacation balance: the figure, and a 4px bar under it. */
+.vacation-meter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 160px;
+}
+
+.vacation-meter-figure {
+  font-size: var(--text-caption);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.vacation-meter-track {
+  display: block;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.vacation-meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+/* Under a quarter left: warm, so leave planning catches it. */
+.vacation-meter.is-low .vacation-meter-fill {
+  background: var(--tag-red);
+}
+
+.employee-salary {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.employee-contact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+.employee-contact a:hover {
+  color: var(--text-primary);
+}
+
+/* A text link, not a pill: it opens the person's full record. */
+.employee-more {
+  margin-top: var(--space-1);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  color: var(--accent-text);
+}
+
+.employee-more:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Employee form (add and edit) ---------------------------------------------------------- */
+
+.photo-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+  text-align: center;
+}
+
+.photo-slot-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--hairline-strong);
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+.photo-slot-circle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.photo-slot-button {
+  padding: 0;
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  color: var(--accent-text);
+}
+
+.photo-slot .field-hint {
+  max-width: 36ch;
+}
+
+/* IBANs are read character by character, so they get the mono face. */
+form input.input-mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* Paying a month of salaries: the note that replaces the button, and the
+   bank's own plan for the run inside the confirmation modal. */
+
+.payroll-note {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-2);
+  font-size: var(--text-body-sm);
+  letter-spacing: var(--track-body-sm);
+  color: var(--text-muted);
+}
+
+.payroll-lines {
+  display: flex;
+  flex-direction: column;
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.payroll-lines li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: var(--text-body-sm);
+}
+
+.payroll-lines-name {
+  color: var(--text-primary);
+}
+
+/* Which account the salary comes off, in the mono face figures use. */
+.payroll-lines-from {
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.payroll-lines-amount {
+  font-size: var(--text-body-sm);
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* The two lines that go to the state rather than to a person: same row, but
+   the name reads as a charge rather than as somebody who got paid. */
+.payroll-lines li.is-statutory .payroll-lines-name {
+  color: var(--text-secondary);
+}
+
+.payroll-split {
+  margin-top: var(--space-4);
+  font-size: var(--text-caption);
+  letter-spacing: var(--track-caption);
+  color: var(--text-muted);
+}
+
+.payroll-account-total {
+  margin-top: var(--space-4);
+  font-size: var(--text-caption);
+  letter-spacing: var(--track-caption);
+  color: var(--text-muted);
+}
+
+.payroll-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+.payroll-total strong {
+  font-size: var(--text-title);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--track-subheading);
+  color: var(--text-primary);
+}
+
+.payroll-paid {
+  margin-top: var(--space-4);
+  font-size: var(--text-body);
+  color: var(--text-primary);
+}
+
+/* Who could not be covered, when the bank refuses the run. */
+.payroll-uncovered {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-5);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 560px) {
+  .employees .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .employee-form .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Gross → net ------------------------------------------------------------------ */
+
+.employee-pay {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.employee-salary-net {
+  font-size: var(--text-label);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* The payslip ladder inside the employee form. */
+.salary-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  box-shadow: var(--hairline) 0 0 0 1px inset;
+  background: var(--surface-2);
+  transition: opacity var(--transition);
+}
+
+/* Last figures stay up, dimmed, while the new salary is being priced. */
+.salary-breakdown.is-updating {
+  opacity: 0.6;
+}
+
+.salary-breakdown-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.salary-breakdown-lines {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.salary-breakdown-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-1) 0;
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+.salary-breakdown-line dt,
+.salary-breakdown-line dd {
+  margin: 0;
+}
+
+.salary-breakdown-line dd {
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* A running figure after a deduction, set off by a rule like on a payslip. */
+.salary-breakdown-line.is-subtotal {
+  margin-bottom: var(--space-1);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+  color: var(--text-primary);
+}
+
+.salary-breakdown-line.is-total {
+  margin-top: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--hairline-strong);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+}
+
+.salary-breakdown-line.is-total dd {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.salary-breakdown-missing {
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+/* Message to the team ----------------------------------------------------------- */
+
+.message-recipients {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.message-recipients-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.message-recipients-label {
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+.message-recipients-toggle {
+  margin-left: auto;
+  font-size: var(--text-label);
+}
+
+/* Scrolls on its own once the team is long, so subject and message stay in view. */
+.message-recipient-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 232px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  border: 1px solid color-mix(in srgb, var(--text-primary) 8%, transparent);
+  border-radius: var(--radius-control);
+}
+
+form label.message-recipient {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, auto);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+form label.message-recipient:hover {
+  background: var(--surface-2);
+}
+
+form label.message-recipient.is-selected {
+  color: var(--text-primary);
+}
+
+form .message-recipient input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.message-recipient-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.message-recipient-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-label);
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.message-form textarea {
+  min-height: 160px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.message-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-size: var(--text-body-sm);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 560px) {
+  .employees-actions {
+    justify-content: flex-start;
+  }
+
+  form label.message-recipient {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .message-recipient-email {
+    grid-column: 2;
+    text-align: left;
+  }
+}
+
+/* Phones: one card per person instead of an 860px table scrolling sideways —
+   name and role on top, pay and leave under them, then how to reach them. */
+@media (max-width: 640px) {
+  .employee-table {
+    min-width: 0;
+  }
+
+  .employee-table thead {
+    display: none;
+  }
+
+  .employee-table,
+  .employee-table tbody {
+    display: block;
+  }
+
+  .employee-table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'person role'
+      'pay vacation'
+      'contact contact';
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .employee-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  /* As specific as the desktop cell padding it replaces. */
+  .employee-table-card .employee-table td {
+    padding: 0;
+    border: none;
+  }
+
+  .employee-table .cell-person {
+    grid-area: person;
+    min-width: 0;
+  }
+
+  .employee-table .cell-role {
+    grid-area: role;
+  }
+
+  .employee-table .cell-pay {
+    grid-area: pay;
+  }
+
+  .employee-table .cell-vacation {
+    grid-area: vacation;
+  }
+
+  .employee-table .cell-contact {
+    grid-area: contact;
+    min-width: 0;
+  }
+
+  .employee-table .employee-name {
+    white-space: normal;
+  }
+
+  .vacation-meter {
+    width: 128px;
+  }
+
+  .employee-contact a {
+    overflow-wrap: anywhere;
+  }
+}

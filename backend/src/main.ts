@@ -1,29 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
-import cookieParser from 'cookie-parser';
-import helmet from 'helmet';
 import { AppModule } from './app.module.js';
+import { configureApp } from './app.setup.js';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
+  // `rawBody` keeps the untouched request bytes on the request object. The
+  // bank signs its webhooks over exactly those bytes, and re-serialising the
+  // parsed JSON would never reproduce them.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
+  configureApp(app);
 
-  app.use(helmet());
-  app.use(cookieParser());
-  app.enableCors({
-    origin: configService.getOrThrow<string[]>('app.corsOrigins', { infer: true }),
-    credentials: true,
-  });
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
-
-  const port = configService.get<number>('app.port', { infer: true }) ?? 3000;
+  const port = app.get(ConfigService).get<number>('app.port', { infer: true }) ?? 3000;
   await app.listen(port);
 }
 await bootstrap();

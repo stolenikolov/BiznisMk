@@ -1,0 +1,16 @@
+import { useSyncExternalStore } from 'react';
+
+/** Whether a CSS media query matches, kept current as the window changes. */
+export function useMediaQuery(query: string): boolean {
+  return useSyncExternalStore(
+    (onChange) => {
+      const list = window.matchMedia(query);
+      list.addEventListener('change', onChange);
+      return () => list.removeEventListener('change', onChange);
+    },
+    () => window.matchMedia(query).matches,
+  );
+}
+
+/** Settings' phone layout, where the menu and a section are separate screens. Matches settings.css. */
+export const SETTINGS_NARROW = '(max-width: 760px)';
