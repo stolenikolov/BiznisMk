@@ -6,6 +6,7 @@ import { AuditAction, AuditService } from '../../audit/audit.service.js';
 import { TwoFactorPurpose } from '../../generated/prisma/enums.js';
 import type { AuthRequestContext } from '../request-context.js';
 import { TrustedDevicesService } from './trusted-devices.service.js';
+import { inBackground } from '../../common/background.js';
 import { renderTwoFactorAlertEmail, renderTwoFactorCodeEmail, type EmailLocale } from './two-factor-emails.js';
 import {
   canResend,
@@ -312,18 +313,20 @@ export class TwoFactorService {
 
   /** In the background: the change is made whether or not the notice goes out. */
   private sendAlert(user: CodeUser, change: 'enabled' | 'disabled', locale: EmailLocale): void {
-    void this.mail
-      .send({
-        to: user.email,
-        fromName: 'BiznisMk',
-        ...renderTwoFactorAlertEmail({
-          firstName: user.firstName,
-          change,
-          forgotLink: `${this.appUrl}/forgot-password`,
-          locale,
-        }),
-      })
-      .catch((error: unknown) => this.logger.error(`Could not send a two-factor notice: ${String(error)}`));
+    inBackground(
+      this.mail
+        .send({
+          to: user.email,
+          fromName: 'BiznisMk',
+          ...renderTwoFactorAlertEmail({
+            firstName: user.firstName,
+            change,
+            forgotLink: `${this.appUrl}/forgot-password`,
+            locale,
+          }),
+        })
+        .catch((error: unknown) => this.logger.error(`Could not send a two-factor notice: ${String(error)}`)),
+    );
   }
 }
 

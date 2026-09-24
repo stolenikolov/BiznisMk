@@ -1,6 +1,7 @@
 import { Injectable, Logger, type OnApplicationBootstrap } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { ON_VERCEL } from '../common/runtime.js';
 import { EmployeeStatus, InvoiceStatus } from '../generated/prisma/enums.js';
 import { NotificationsService, accountLabel } from './notifications.service.js';
 import {
@@ -46,8 +47,12 @@ export class DueRemindersService implements OnApplicationBootstrap {
    * worthless tomorrow, so the day is caught up on instead of skipped.
    * Repeating a sweep costs nothing: every row carries a dedupe key, so a
    * second run over the same day writes nothing.
+   *
+   * Not on Vercel, where the app starts on a visitor's request: the sweep
+   * would sit in front of their answer, and Vercel Cron runs it anyway.
    */
   async onApplicationBootstrap(): Promise<void> {
+    if (ON_VERCEL) return;
     await this.runDaily();
   }
 

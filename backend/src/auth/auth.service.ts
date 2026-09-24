@@ -7,6 +7,7 @@ import { MailService } from '../mail/mail.service.js';
 import { AuditAction, AuditService, type RequestContext } from '../audit/audit.service.js';
 import { TokensService } from './tokens.service.js';
 import { renderAccountLockedEmail } from './account-emails.js';
+import { inBackground } from '../common/background.js';
 import type { RegisterDto } from './dto/register.dto.js';
 import type { LoginDto } from './dto/login.dto.js';
 import type { AccessTokenPayload } from './types/jwt-payload.type.js';
@@ -153,18 +154,20 @@ export class AuthService {
       metadata: { lockedUntil: lockedUntil.toISOString() },
       ...context,
     });
-    void this.mail
-      .send({
-        to: user.email,
-        fromName: 'BiznisMk',
-        ...renderAccountLockedEmail({
-          firstName: user.firstName,
-          attempts: MAX_FAILED_LOGINS,
-          minutes: LOGIN_LOCK_MS / 60_000,
-          forgotLink: `${this.appUrl}/forgot-password`,
-        }),
-      })
-      .catch((error: unknown) => this.logger.error(`Could not send an account-locked notice: ${String(error)}`));
+    inBackground(
+      this.mail
+        .send({
+          to: user.email,
+          fromName: 'BiznisMk',
+          ...renderAccountLockedEmail({
+            firstName: user.firstName,
+            attempts: MAX_FAILED_LOGINS,
+            minutes: LOGIN_LOCK_MS / 60_000,
+            forgotLink: `${this.appUrl}/forgot-password`,
+          }),
+        })
+        .catch((error: unknown) => this.logger.error(`Could not send an account-locked notice: ${String(error)}`)),
+    );
     throw accountLocked(lockedUntil);
   }
 

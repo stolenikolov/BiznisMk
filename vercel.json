@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "NODE_ENV=development pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter backend run vercel-build && pnpm --filter frontend run build",
+  "outputDirectory": "frontend/dist",
+  "regions": ["lhr1"],
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "crons": [{ "path": "/api/cron/due-reminders", "schedule": "0 5 * * *" }]
+}

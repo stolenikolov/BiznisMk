@@ -4,6 +4,7 @@ import { NotificationsController } from './notifications.controller.js';
 import { NotificationsService } from './notifications.service.js';
 import { NotificationsGateway } from './notifications.gateway.js';
 import { DueRemindersService } from './due-reminders.service.js';
+import { CronController } from './cron.controller.js';
 
 /**
  * Notifications: persisted rows, a websocket that pushes them, and the daily
@@ -20,7 +21,7 @@ import { DueRemindersService } from './due-reminders.service.js';
  */
 @Module({
   imports: [JwtModule.register({})],
-  controllers: [NotificationsController],
+  controllers: [NotificationsController, CronController],
   providers: [NotificationsService, NotificationsGateway, DueRemindersService],
   exports: [NotificationsService],
 })

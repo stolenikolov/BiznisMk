@@ -6,6 +6,7 @@ import { MailService } from '../mail/mail.service.js';
 import { hashToken } from './auth.service.js';
 import { renderAccountChangedEmail } from './account-emails.js';
 import { TrustedDevicesService } from './two-factor/trusted-devices.service.js';
+import { inBackground } from '../common/background.js';
 import type { User } from '../generated/prisma/client.js';
 import type { UpdateProfileDto } from './dto/profile.dto.js';
 
@@ -111,9 +112,11 @@ export class ProfileService {
 
   /** In the background: the change is saved whether or not the notice goes out. */
   private notify(to: string, email: { subject: string; text: string; html: string }): void {
-    void this.mail
-      .send({ to, fromName: 'BiznisMk', ...email })
-      .catch((error: unknown) => this.logger.error(`Could not send an account notice: ${String(error)}`));
+    inBackground(
+      this.mail
+        .send({ to, fromName: 'BiznisMk', ...email })
+        .catch((error: unknown) => this.logger.error(`Could not send an account notice: ${String(error)}`)),
+    );
   }
 }
 

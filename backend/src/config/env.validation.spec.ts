@@ -82,6 +82,13 @@ describe('envValidationSchema — production safety', () => {
     expect(errorOf({ ...BASE, ...short })).toBeUndefined();
   });
 
+  it('requires the cron secret in production on Vercel, and nowhere else', () => {
+    expect(errorOf({ ...PRODUCTION, VERCEL: '1' })).toMatch(/CRON_SECRET/);
+    expect(errorOf({ ...PRODUCTION, VERCEL: '1', CRON_SECRET: 'd'.repeat(32) })).toBeUndefined();
+    expect(errorOf(PRODUCTION)).toBeUndefined();
+    expect(errorOf({ ...PRODUCTION, VERCEL: '1', CRON_SECRET: 'd'.repeat(20) })).toMatch(/CRON_SECRET.*32/);
+  });
+
   it('refuses one value reused for two secrets in production', () => {
     expect(errorOf({ ...PRODUCTION, JWT_REFRESH_SECRET: PRODUCTION.JWT_ACCESS_SECRET })).toMatch(
       /JWT_REFRESH_SECRET.*JWT_ACCESS_SECRET/,

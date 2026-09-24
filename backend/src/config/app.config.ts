@@ -29,6 +29,8 @@ export default registerAs('app', () => ({
   cookieSecure: process.env.COOKIE_SECURE === 'true',
   /** Keys the stored hashes of emailed two-factor codes; kept apart from the JWT secrets. */
   twoFactorSecret: process.env.TWO_FACTOR_SECRET,
+  /** What Vercel Cron sends as its bearer token; the /cron endpoints refuse everyone without it. */
+  cronSecret: process.env.CRON_SECRET,
   /**
    * Shared with the bank, which signs every webhook with it. Must equal the
    * bank's own WEBHOOK_SIGNING_SECRET. Left undefined the webhook endpoint

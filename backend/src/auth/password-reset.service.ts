@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { MailService } from '../mail/mail.service.js';
 import { hashToken } from './auth.service.js';
 import { renderPasswordResetEmail } from './account-emails.js';
+import { inBackground } from '../common/background.js';
 import { TrustedDevicesService } from './two-factor/trusted-devices.service.js';
 
 /** How long a reset link works. The email says "1 час"; keep the two together. */
@@ -68,9 +69,11 @@ export class PasswordResetService {
     ]);
 
     const link = `${this.appUrl}/reset-password?token=${token}`;
-    void this.mail
-      .send({ to: user.email, fromName: 'BiznisMk', ...renderPasswordResetEmail({ firstName: user.firstName, link }) })
-      .catch((error: unknown) => this.logger.error(`Could not send a password reset email: ${String(error)}`));
+    inBackground(
+      this.mail
+        .send({ to: user.email, fromName: 'BiznisMk', ...renderPasswordResetEmail({ firstName: user.firstName, link }) })
+        .catch((error: unknown) => this.logger.error(`Could not send a password reset email: ${String(error)}`)),
+    );
   }
 
   /**

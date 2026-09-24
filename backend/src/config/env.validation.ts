@@ -15,10 +15,16 @@ const EXAMPLE_VALUES = new Set([
 ]);
 
 /** Secrets this server chooses itself, and so can make long: at least an HMAC-SHA256 key's worth. */
-const OWN_SECRETS = ['JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET', 'TWO_FACTOR_SECRET', 'BANK_WEBHOOK_SIGNING_SECRET'] as const;
+const OWN_SECRETS = [
+  'JWT_ACCESS_SECRET',
+  'JWT_REFRESH_SECRET',
+  'TWO_FACTOR_SECRET',
+  'BANK_WEBHOOK_SIGNING_SECRET',
+  'CRON_SECRET',
+] as const;
 const PRODUCTION_SECRET_MIN_LENGTH = 32;
 
-type ValidatedEnv = Partial<Record<(typeof OWN_SECRETS)[number] | 'BANK_API_KEY' | 'SMTP_HOST', string>> & {
+type ValidatedEnv = Partial<Record<(typeof OWN_SECRETS)[number] | 'BANK_API_KEY' | 'SMTP_HOST' | 'VERCEL', string>> & {
   NODE_ENV: string;
   COOKIE_SECURE: boolean;
 };
@@ -30,6 +36,8 @@ function productionProblem(env: ValidatedEnv): string | null {
   if (env.COOKIE_SECURE !== true) {
     return '"COOKIE_SECURE" must be true in production, so session cookies never travel over plain HTTP';
   }
+  // On Vercel the daily reminders only run when Vercel Cron calls in with it.
+  if (env.VERCEL === '1' && !env.CRON_SECRET) return '"CRON_SECRET" is required in production on Vercel';
 
   for (const name of [...OWN_SECRETS, 'BANK_API_KEY'] as const) {
     if (env[name] !== undefined && EXAMPLE_VALUES.has(env[name])) {
@@ -74,6 +82,11 @@ export const envValidationSchema = Joi.object({
   TWO_FACTOR_SECRET: Joi.string().min(16).required(),
 
   COOKIE_SECURE: Joi.boolean().default(false),
+
+  // Set by Vercel itself ("1") on its builds and functions.
+  VERCEL: Joi.string().optional(),
+  // Vercel Cron's bearer token for /cron/*; without it those endpoints refuse everyone.
+  CRON_SECRET: Joi.string().min(16).optional(),
 
   // Shared with the mock bank, which signs its webhooks with it. Optional so
   // an install that has not connected a bank still boots; without it the

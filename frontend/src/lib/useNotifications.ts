@@ -34,6 +34,13 @@ interface NotificationPage {
 const PAGE_SIZE = 20;
 
 /**
+ * Serverless hosting (Vercel) cannot hold a websocket open, so there the feed
+ * is polled instead. Set at build time; local development keeps the socket.
+ */
+const LIVE_FEED = import.meta.env.VITE_LIVE_NOTIFICATIONS !== 'off';
+const POLL_INTERVAL_MS = 30_000;
+
+/**
  * Where a notification points.
  *
  * Returns null when there is nowhere useful to go — the row still renders, it
@@ -63,10 +70,11 @@ export function notificationLink(notification: AppNotification): string | null {
 /**
  * The notification centre: the persisted list, the live feed, and read state.
  *
- * Rows are loaded over REST and then kept current by the websocket, rather than
- * by polling — a notification that arrives while the panel is open appears at
- * the top on its own. Reconnecting reloads the list, because anything that
- * happened while the socket was down was persisted but never pushed.
+ * Rows are loaded over REST and then kept current by the websocket — a
+ * notification that arrives while the panel is open appears at the top on its
+ * own. Reconnecting reloads the list, because anything that happened while the
+ * socket was down was persisted but never pushed. Where no socket can be held
+ * (VITE_LIVE_NOTIFICATIONS=off), the first page is polled instead.
  *
  * Only runs for a session that has entered a company: notifications are
  * company-scoped, and there is no room to join without one.
@@ -141,8 +149,33 @@ export function useNotificationFeed() {
     }
   }, [nextCursor, isLoadingMore]);
 
+  // Polling: the first page is re-read and folded into what is on screen, so
+  // pages loaded further down stay put and a row read elsewhere updates here.
   useEffect(() => {
-    if (!companyId) return;
+    if (!companyId || LIVE_FEED) return;
+
+    const refresh = async () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        const { data } = await api.get<NotificationPage>('/notifications', { params: { limit: PAGE_SIZE } });
+        setNotifications((current) => withLatest(current, data.notifications));
+        setUnreadCount(data.unreadCount);
+      } catch {
+        // The next tick tries again.
+      }
+    };
+
+    const timer = window.setInterval(() => void refresh(), POLL_INTERVAL_MS);
+    // Coming back to the tab is when someone looks, so it refreshes at once.
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, [companyId]);
+
+  useEffect(() => {
+    if (!companyId || !LIVE_FEED) return;
 
     const socket: Socket = connectNotifications();
 
@@ -244,6 +277,16 @@ export function useNotifications(): NotificationFeed {
 }
 
 /** Appends a page, dropping anything already on screen. */
+/** A fresh first page folded into the list: new rows on top, known rows updated in place. */
+function withLatest(current: AppNotification[], latest: AppNotification[]): AppNotification[] {
+  const latestById = new Map(latest.map((notification) => [notification.id, notification]));
+  const known = new Set(current.map((notification) => notification.id));
+  return [
+    ...latest.filter((notification) => !known.has(notification.id)),
+    ...current.map((notification) => latestById.get(notification.id) ?? notification),
+  ];
+}
+
 function mergeById(current: AppNotification[], incoming: AppNotification[]): AppNotification[] {
   const seen = new Set(current.map((notification) => notification.id));
   return [...current, ...incoming.filter((notification) => !seen.has(notification.id))];

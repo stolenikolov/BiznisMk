@@ -15,6 +15,7 @@ import { PayrollModule } from './payroll/payroll.module.js';
 import { WorkScheduleModule } from './schedule/schedule.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { envValidationSchema } from './config/env.validation.js';
+import { ON_VERCEL } from './common/runtime.js';
 import appConfig from './config/app.config.js';
 import jwtConfig from './config/jwt.config.js';
 
@@ -26,8 +27,9 @@ import jwtConfig from './config/jwt.config.js';
       validationSchema: envValidationSchema,
       load: [appConfig, jwtConfig],
     }),
-    // Drives the daily due-date sweep in NotificationsModule.
-    ScheduleModule.forRoot(),
+    // Drives the daily due-date sweep in NotificationsModule. On Vercel there is
+    // no process to keep a timer in; Vercel Cron calls /cron/due-reminders.
+    ...(ON_VERCEL ? [] : [ScheduleModule.forRoot()]),
     PrismaModule,
     AuthModule,
     CompaniesModule,
