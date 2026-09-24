@@ -40,3 +40,4 @@ Thumbs.db
 
 # Emails saved locally when no SMTP server is configured
 .mail-outbox/
+.neon

@@ -5,12 +5,16 @@ import { resolve } from 'node:path';
 export const E2E_SCHEMA = 'e2e';
 
 /**
- * DATABASE_URL for the e2e run: E2E_DATABASE_URL when set, otherwise the
- * development database from .env with its schema switched to `e2e` — same
- * server, same role, none of the development rows.
+ * DATABASE_URL for the e2e run: E2E_DATABASE_URL from the environment or
+ * .env when set, otherwise the development database from .env — either way
+ * with its schema switched to `e2e`, so none of the app's own rows are touched.
+ *
+ * Set E2E_DATABASE_URL whenever DATABASE_URL points at a hosted database, so
+ * the tests keep to a local one.
  */
 export function e2eDatabaseUrl(): string {
-  const base = process.env.E2E_DATABASE_URL ?? readEnvFile().DATABASE_URL;
+  const env = readEnvFile();
+  const base = process.env.E2E_DATABASE_URL ?? env.E2E_DATABASE_URL ?? env.DATABASE_URL;
   if (!base) throw new Error('No database for the e2e tests: set E2E_DATABASE_URL or DATABASE_URL in backend/.env');
 
   const url = new URL(base);
