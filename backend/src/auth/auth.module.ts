@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerModule } from '@nestjs/throttler';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { TokensService } from './tokens.service.js';
@@ -22,9 +21,6 @@ import { JwtAccessGuard } from './guards/jwt-access.guard.js';
     JwtModule.register({}),
     MailModule,
     AuditModule,
-    // Per-route limits (@Throttle) on the endpoints that send or check codes;
-    // this is only the fallback for the other routes of those controllers.
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 60 }]),
   ],
   controllers: [AuthController, TwoFactorController],
   providers: [

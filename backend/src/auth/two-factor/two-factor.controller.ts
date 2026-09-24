@@ -12,8 +12,8 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
+import { RateLimit, RateLimitGuard } from '../../common/rate-limit.js';
 import { AuthService } from '../auth.service.js';
 import { TokensService } from '../tokens.service.js';
 import { ProfileService } from '../profile.service.js';
@@ -33,16 +33,16 @@ import { TwoFactorService } from './two-factor.service.js';
 import { TrustedDevicesService } from './trusted-devices.service.js';
 
 /** Endpoints that send a code: a handful a minute per address is plenty for a person. */
-const SEND_LIMIT = { default: { limit: 5, ttl: 60_000 } };
+const SEND_LIMIT = { limit: 5, ttl: 60_000 };
 /** Endpoints that check a code. Each challenge also dies after five wrong guesses. */
-const VERIFY_LIMIT = { default: { limit: 10, ttl: 60_000 } };
+const VERIFY_LIMIT = { limit: 10, ttl: 60_000 };
 
 /**
  * Email two-factor: the second step of signing in, switching it on and off,
  * and the browsers trusted to skip it.
  */
 @Controller('auth')
-@UseGuards(ThrottlerGuard)
+@UseGuards(RateLimitGuard)
 export class TwoFactorController {
   constructor(
     private readonly authService: AuthService,
@@ -58,7 +58,7 @@ export class TwoFactorController {
   @Public()
   @Post('2fa/verify')
   @HttpCode(HttpStatus.OK)
-  @Throttle(VERIFY_LIMIT)
+  @RateLimit(VERIFY_LIMIT)
   async verify(@Body() dto: VerifyTwoFactorDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const context = requestContext(req);
     const userId = await this.twoFactor.verifyLogin(dto.challengeId, dto.code, context);
@@ -75,7 +75,7 @@ export class TwoFactorController {
   @Public()
   @Post('2fa/resend')
   @HttpCode(HttpStatus.OK)
-  @Throttle(SEND_LIMIT)
+  @RateLimit(SEND_LIMIT)
   async resend(@Body() dto: ResendTwoFactorDto, @Req() req: Request) {
     return this.twoFactor.resendLogin(dto.challengeId, requestContext(req));
   }
@@ -89,14 +89,14 @@ export class TwoFactorController {
 
   @Post('2fa/enable/start')
   @HttpCode(HttpStatus.OK)
-  @Throttle(SEND_LIMIT)
+  @RateLimit(SEND_LIMIT)
   async startEnable(@CurrentUser() user: AuthenticatedUser, @Req() req: Request) {
     return this.twoFactor.startEnable(user.userId, requestContext(req));
   }
 
   @Post('2fa/enable/confirm')
   @HttpCode(HttpStatus.OK)
-  @Throttle(VERIFY_LIMIT)
+  @RateLimit(VERIFY_LIMIT)
   async confirmEnable(@CurrentUser() user: AuthenticatedUser, @Body() dto: ConfirmTwoFactorDto, @Req() req: Request) {
     return this.twoFactor.confirmEnable(user.userId, dto.code, requestContext(req));
   }
@@ -104,14 +104,14 @@ export class TwoFactorController {
   /** Sends the code that /auth/2fa/disable asks for together with the password. */
   @Post('2fa/disable/start')
   @HttpCode(HttpStatus.OK)
-  @Throttle(SEND_LIMIT)
+  @RateLimit(SEND_LIMIT)
   async startDisable(@CurrentUser() user: AuthenticatedUser, @Req() req: Request) {
     return this.twoFactor.startDisable(user.userId, requestContext(req));
   }
 
   @Post('2fa/disable')
   @HttpCode(HttpStatus.OK)
-  @Throttle(VERIFY_LIMIT)
+  @RateLimit(VERIFY_LIMIT)
   async disable(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: DisableTwoFactorDto,

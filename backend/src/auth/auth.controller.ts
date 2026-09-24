@@ -11,8 +11,8 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
+import { RateLimit, RateLimitGuard } from '../common/rate-limit.js';
 import { AuthService } from './auth.service.js';
 import { TokensService } from './tokens.service.js';
 import { ProfileService } from './profile.service.js';
@@ -59,8 +59,8 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(ThrottlerGuard)
-  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 10, ttl: 60_000 })
   async login(@Body() dto: LoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const user = await this.authService.verifyCredentials(dto, requestContext(req));
 
